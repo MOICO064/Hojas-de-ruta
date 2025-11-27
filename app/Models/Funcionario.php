@@ -15,7 +15,6 @@ class Funcionario extends Model
      * Los atributos que se pueden asignar masivamente.
      */
     protected $fillable = [
-        'secretaria_id',
         'unidad_id',
         'ci',
         'nombre',
@@ -35,10 +34,6 @@ class Funcionario extends Model
     /**
      * Relación con la secretaria (un funcionario pertenece a una secretaria)
      */
-    public function secretaria()
-    {
-        return $this->belongsTo(Secretaria::class, 'secretaria_id', 'id');
-    }
 
     /**
      * Relación con la unidad (un funcionario pertenece a una unidad)

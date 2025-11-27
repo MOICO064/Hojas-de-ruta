@@ -12,14 +12,28 @@ return new class extends Migration {
     {
         Schema::create('unidades', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('secretaria_id')->constrained();
+
+            // Relación jerárquica (unidad superior)
+            $table->foreignId('unidad_padre_id')
+                ->nullable()
+                ->constrained('unidades')
+                ->nullOnDelete();
+
+            // Jefe o responsable de esta unidad
+            $table->string('jefe')->nullable();
+
             $table->string('nombre');
             $table->string('codigo', 20)->nullable();
             $table->integer('telefono');
             $table->integer('celular');
+
+            $table->integer('nivel')->default(1);
+
             $table->enum('estado', ['ACTIVO', 'INACTIVO'])->default('ACTIVO');
+
             $table->timestamps();
         });
+
     }
 
     public function down(): void

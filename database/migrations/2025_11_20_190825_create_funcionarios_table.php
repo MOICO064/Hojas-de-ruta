@@ -12,7 +12,6 @@ return new class extends Migration {
     {
         Schema::create('funcionarios', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('secretaria_id')->nullable()->constrained('secretarias')->nullOnDelete();
             $table->foreignId('unidad_id')->nullable()->constrained('unidades')->nullOnDelete();
             $table->string('ci', 20);
             $table->string('nombre');

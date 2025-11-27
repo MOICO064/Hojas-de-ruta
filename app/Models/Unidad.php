@@ -2,67 +2,55 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Unidad extends Model
 {
     use HasFactory;
 
-    // Tabla explícita
     protected $table = 'unidades';
 
-    /**
-     * Los atributos que se pueden asignar masivamente.
-     */
     protected $fillable = [
-        'secretaria_id',
         'nombre',
         'codigo',
         'telefono',
         'celular',
         'estado',
+        'nivel',
+        'unidad_padre_id',
+        'jefe',
     ];
 
     /**
-     * Los atributos que deben ser casteados a tipos nativos.
+     * Unidad padre (para estructura jerárquica).
      */
-    protected $casts = [
-        'telefono' => 'integer',
-        'celular' => 'integer',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-    ];
-
-    /**
-     * Relación con la secretaria (una unidad pertenece a una secretaria)
-     */
-    public function secretaria()
+    public function unidadPadre()
     {
-        return $this->belongsTo(Secretaria::class, 'secretaria_id', 'id');
+        return $this->belongsTo(Unidad::class, 'unidad_padre_id');
     }
 
     /**
-     * Relación con funcionarios (una unidad tiene muchos funcionarios)
+     * Unidades hijas (dependencias).
+     */
+    public function unidadesHijas()
+    {
+        return $this->hasMany(Unidad::class, 'unidad_padre_id');
+    }
+
+    /**
+     * Funcionarios asociados a esta unidad.
      */
     public function funcionarios()
     {
-        return $this->hasMany(Funcionario::class, 'unidad_id', 'id');
+        return $this->hasMany(Funcionario::class, 'unidad_id');
     }
 
     /**
-     * Relación con hojas de ruta (una unidad puede tener muchas hojas de ruta como origen)
+     * Hojas de ruta emitidas desde esta unidad.
      */
     public function hojasRutaOrigen()
     {
-        return $this->hasMany(HojaRuta::class, 'unidad_origen', 'id');
-    }
-
-    /**
-     * Relación con hojas de ruta (una unidad puede tener muchas hojas de ruta como destino)
-     */
-    public function hojasRutaDestino()
-    {
-        return $this->hasMany(HojaRuta::class, 'unidad_destino', 'id');
+        return $this->hasMany(HojaRuta::class, 'unidad_origen_id');
     }
 }
