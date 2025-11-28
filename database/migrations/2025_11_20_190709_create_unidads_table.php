@@ -12,14 +12,11 @@ return new class extends Migration {
     {
         Schema::create('unidades', function (Blueprint $table) {
             $table->id();
-
-            // Relación jerárquica (unidad superior)
             $table->foreignId('unidad_padre_id')
                 ->nullable()
                 ->constrained('unidades')
                 ->nullOnDelete();
 
-            // Jefe o responsable de esta unidad
             $table->string('jefe')->nullable();
 
             $table->string('nombre');
