@@ -94,14 +94,15 @@ $(document).ready(function () {
                     title: 'Error',
                     html: message.replace(/\n/g, '<br>'),
                     toast: true,
-                    position: 'top-end',
+                    position: 'top',
                     timer: 5000,
                     timerProgressBar: true,
                     showConfirmButton: false,
-                    width: '300px',
+                    width: '400px',
                     customClass: {
                         popup: 'swal2-toast-width'
-                    }
+                    },
+                    ...swalStyles()
                 });
 
 

@@ -22,11 +22,11 @@ return new class extends Migration {
             $table->string('nombre');
             $table->string('codigo', 20)->nullable();
             $table->integer('telefono');
-            $table->integer('celular');
+            $table->integer('interno');
 
             $table->integer('nivel')->default(1);
 
-            $table->enum('estado', ['ACTIVO', 'INACTIVO'])->default('ACTIVO');
+            $table->enum('estado', ['ACTIVO', 'ANULADO'])->default('ACTIVO');
 
             $table->timestamps();
         });

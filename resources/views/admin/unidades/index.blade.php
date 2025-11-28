@@ -46,7 +46,7 @@
                                     <th>Jefe</th>
                                     <th>Código</th>
                                     <th>Teléfono</th>
-                                    <th>Celular</th>
+                                    <th>Interno</th>
                                     <th>Nivel</th>
                                     <th>Subunidades</th>
                                     <th>Estado</th>
@@ -65,4 +65,4 @@
 @section('scripts')
     <script src="{{ asset('js/unidades/index.js') }}"></script>
     <script src="{{ asset('js/unidades/delete.js') }}"></script>
- @endsectionf
+ @endsection

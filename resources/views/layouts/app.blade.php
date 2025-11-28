@@ -84,13 +84,7 @@
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
 
-
-    <!-- Tu JS de la tabla -->
-    <script src="{{ asset('js/unidades/index.js') }}"></script>
-
-
-
-
+    <script src="{{ asset('js/swalAlert/theme.js') }}"></script>
     @yield('scripts')
 </body>
 

@@ -1,9 +1,42 @@
 $(document).ready(function () {
+
     let table = $('#unidades-table').DataTable({
         processing: true,
         serverSide: true,
-        responsive: true,
+        responsive: {
+            details: {
+                type: 'inline',
+                display: $.fn.dataTable.Responsive.display.childRowImmediate,
+                renderer: function (api, rowIdx, columns) {
+                    let data = $.map(columns, function (col) {
+                        return col.hidden
+                            ? `<tr>
+                                <td><strong>${col.title}</strong></td>
+                                <td>${col.data}</td>
+                               </tr>`
+                            : '';
+                    }).join('');
+
+                    return data
+                        ? $('<table class="table table-bordered w-100"/>').append(data)
+                        : false;
+                }
+            }
+        },
         ajax: "/admin/unidades/data",
+
+        dom: `
+            <"dt-top-container d-flex flex-wrap justify-content-between  gap-2"
+                <"dt-left d-flex " l>
+                <"dt-right d-flex " f>
+            >
+            rt
+            <"dt-bottom-container d-flex flex-wrap justify-content-center gap-2"
+                <"dt-info text-center" i>
+                <"dt-paginate text-center" p>
+            >
+        `,
+
         columns: [
             { data: 'id', name: 'id' },
             { data: 'unidad_padre', name: 'unidad_padre' },
@@ -11,30 +44,41 @@ $(document).ready(function () {
             { data: 'jefe', name: 'jefe' },
             { data: 'codigo', name: 'codigo' },
             { data: 'telefono', name: 'telefono' },
-            { data: 'celular', name: 'celular' },
+            { data: 'interno', name: 'interno' },
             { data: 'nivel', name: 'nivel' },
             { data: 'sub_unidades_count', name: 'sub_unidades_count' },
             { data: 'estado', name: 'estado' },
             { data: 'acciones', name: 'acciones', orderable: false, searchable: false }
         ],
+
         language: {
             url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
         }
     });
 
     $('#refresh-table').on('click', function () {
-        // Agregar clase spin a los iconos
         $('#refresh-icon, #refresh-icon-mobile').addClass('spin');
 
-        table.ajax.reload(null, false); // recarga solo la tabla
+        table.ajax.reload(null, false);
 
-        // Quitar la clase spin cuando termine
         table.on('xhr', function () {
             $('#refresh-icon, #refresh-icon-mobile').removeClass('spin');
+
+            Swal.fire({
+                toast: true,
+                position: 'top',
+                icon: 'success',
+                title: 'Tabla actualizada',
+                showConfirmButton: false,
+                timer: 2000,
+                customClass: {
+                    popup: 'swal2-toast-width'
+                },
+                ...swalStyles()
+            });
         });
     });
 
-    // Inicializar feather icons
     if (typeof feather !== 'undefined') {
         feather.replace();
     }

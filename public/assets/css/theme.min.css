@@ -35826,3 +35826,38 @@ div.table-responsive>div.dataTables_wrapper>div.row {
     animation: spin 1s linear infinite;
 }
 
+/* Acomoda buscador + mostrar registros */
+.dt-top-container {
+    width: 100%;
+}
+
+.dataTables_length,
+.dataTables_filter {
+    margin: 0 !important;
+}
+
+.dataTables_filter input {
+    width: 200px;
+}
+
+@media (max-width: 576px) {
+    .dataTables_filter input {
+        width: 100%;
+    }
+}
+
+/* Animación del icono refresh */
+.spin {
+    animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Child row FULL ancho */
+table.dataTable tr.child td.child {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}

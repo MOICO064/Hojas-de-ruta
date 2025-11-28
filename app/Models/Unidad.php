@@ -12,14 +12,14 @@ class Unidad extends Model
     protected $table = 'unidades';
 
     protected $fillable = [
+        'unidad_padre_id',
+        'jefe',
         'nombre',
         'codigo',
         'telefono',
-        'celular',
-        'estado',
+        'interno',
         'nivel',
-        'unidad_padre_id',
-        'jefe',
+        'estado',
     ];
 
     /**

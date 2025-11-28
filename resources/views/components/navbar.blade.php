@@ -13,7 +13,7 @@
             </svg>
         </a>
 
-        <div class="d-none d-md-none d-lg-block">
+        <div class="d-none ">
             <!-- Form -->
             <form action="#">
                 <div class="input-group">

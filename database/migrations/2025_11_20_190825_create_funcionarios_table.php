@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->string('ci', 20);
             $table->string('nombre');
             $table->string('cargo')->nullable();
+            $table->string('nro_item')->nullable();
             $table->string('estado');
             $table->string('celular', 30)->nullable();
             $table->timestamps();
