@@ -25,22 +25,37 @@ class UnidadController extends Controller
             ->addColumn('acciones', function (Unidad $unidad) {
 
                 $edit = '<a href="' . route('admin.unidades.edit', $unidad->id) . '" 
-                class="btn btn-sm btn-outline-primary d-flex align-items-center me-1" 
-                title="Editar Unidad">
-                <i data-feather="edit" class="nav-icon me-1 d-none d-md-inline"></i>
-                <span class="d-none d-md-inline">Editar</span>
-                <i data-feather="edit" class="nav-icon d-inline d-md-none"></i>
-             </a>';
+                            class="btn btn-sm btn-outline-primary d-flex align-items-center me-1" 
+                            title="Editar Unidad">
+                            <i data-feather="edit-2" class="nav-icon me-1 d-none d-md-inline"></i>
+                            <span class="d-none d-md-inline">Editar</span>
+                            <i data-feather="edit-2" class="nav-icon d-inline d-md-none"></i>
+                        </a>';
 
-                $delete = '<button type="button" onclick="eliminarUnidad(' . $unidad->id . ')" 
-                    class="btn btn-sm btn-outline-danger d-flex align-items-center" 
-                    title="Eliminar Unidad">
-                    <i data-feather="trash-2" class="nav-icon me-1 d-none d-md-inline"></i>
-                    <span class="d-none d-md-inline">Eliminar</span>
-                    <i data-feather="trash-2" class="nav-icon d-inline d-md-none"></i>
-               </button>';
+                // Botón Ver Organigrama solo si la unidad está ACTIVA
+                $org = '';
+                if ($unidad->estado === 'ACTIVO' && $unidad->unidadesHijas->count() > 0) {
+                    $org = '<a href="' . route('admin.unidad.showTree', $unidad->id) . '" 
+                                class="btn btn-sm btn-outline-success d-flex align-items-center" 
+                                title="Ver Organigrama">
+                                <i data-feather="layout" class="nav-icon me-1 d-none d-md-inline"></i>
+                                <span class="d-none d-md-inline">Organigrama</span>
+                                <i data-feather="layout" class="nav-icon d-inline d-md-none"></i>
+                            </a>';
+                }
+                $delete = '';
+                if ($unidad->estado != "ANULADO") {
+                    $delete = '<button type="button" onclick="eliminarUnidad(' . $unidad->id . ')" 
+                                    class="btn btn-sm btn-outline-danger d-flex align-items-center" 
+                                    title="Eliminar Unidad">
+                                    <i data-feather="trash-2" class="nav-icon me-1 d-none d-md-inline"></i>
+                                    <span class="d-none d-md-inline">Eliminar</span>
+                                    <i data-feather="trash-2" class="nav-icon d-inline d-md-none"></i>
+                            </button>';
+                }
 
-                return '<div class="d-flex flex-wrap gap-1">' . $edit . $delete . '</div>';
+
+                return '<div class="d-flex flex-wrap gap-2">' . $edit . $delete . $org . '</div>';
             })
             ->rawColumns(['acciones'])
 
@@ -64,9 +79,8 @@ class UnidadController extends Controller
                 'nombre' => 'required|string|max:255',
                 'codigo' => 'nullable|string|max:20',
                 'telefono' => 'required|integer',
-                'celular' => 'required|integer',
-                'nivel' => 'required|integer|min:1',
-                'estado' => 'required|in:ACTIVO,INACTIVO',
+                'interno' => 'required|integer',
+                'nivel' => 'required|integer|min:1'
             ]);
 
             if ($validator->fails()) {
@@ -75,15 +89,34 @@ class UnidadController extends Controller
                 ], 422);
             }
 
+            // Determinar el nivel según la unidad padre
+            $nivelRequerido = 1; // por defecto si no tiene padre
+            if ($request->unidad_padre_id) {
+                $unidadPadre = Unidad::find($request->unidad_padre_id);
+                if ($unidadPadre) {
+                    $nivelRequerido = $unidadPadre->nivel + 1;
+
+                    // Validar que el nivel enviado (si existe) sea mayor al de la unidad padre
+                    if ($request->nivel && $request->nivel != $nivelRequerido) {
+                        return response()->json([
+                            'errors' => [
+                                'nivel' => [
+                                    "El nivel debe ser {$nivelRequerido} porque la unidad padre tiene nivel {$unidadPadre->nivel}."
+                                ]
+                            ]
+                        ], 422);
+                    }
+                }
+            }
+
             $unidad = Unidad::create([
                 'unidad_padre_id' => $request->unidad_padre_id,
                 'jefe' => $request->jefe,
                 'nombre' => $request->nombre,
                 'codigo' => $request->codigo,
                 'telefono' => $request->telefono,
-                'celular' => $request->celular,
+                'interno' => $request->interno,
                 'nivel' => $request->nivel,
-                'estado' => $request->estado,
             ]);
 
             return response()->json([
@@ -121,16 +154,16 @@ class UnidadController extends Controller
     public function update(Request $request, Unidad $unidad)
     {
         try {
-            // Misma validación que en store
+            // Validación
             $validator = Validator::make($request->all(), [
                 'unidad_padre_id' => 'nullable|exists:unidades,id',
                 'jefe' => 'nullable|string|max:255',
                 'nombre' => 'required|string|max:255',
                 'codigo' => 'nullable|string|max:20',
                 'telefono' => 'required|integer',
-                'celular' => 'required|integer',
+                'interno' => 'required|integer',
                 'nivel' => 'required|integer|min:1',
-                'estado' => 'required|in:ACTIVO,INACTIVO',
+                'estado' => 'required|in:ACTIVO,ANULADO',
             ]);
 
             if ($validator->fails()) {
@@ -139,42 +172,86 @@ class UnidadController extends Controller
                 ], 422);
             }
 
+            // Determinar nivel según unidad padre
+            $nivelRequerido = 1;
+            if ($request->unidad_padre_id) {
+                $unidadPadre = Unidad::find($request->unidad_padre_id);
+                if ($unidadPadre) {
+                    $nivelRequerido = $unidadPadre->nivel + 1;
+
+                    if ($request->nivel && $request->nivel != $nivelRequerido) {
+                        return response()->json([
+                            'errors' => [
+                                'nivel' => [
+                                    "El nivel debe ser {$nivelRequerido} porque la unidad padre tiene nivel {$unidadPadre->nivel}."
+                                ]
+                            ]
+                        ], 422);
+                    }
+                }
+            }
+
+            // Actualizar la unidad
             $unidad->update([
                 'unidad_padre_id' => $request->unidad_padre_id,
                 'jefe' => $request->jefe,
                 'nombre' => $request->nombre,
                 'codigo' => $request->codigo,
                 'telefono' => $request->telefono,
-                'celular' => $request->celular,
-                'nivel' => $request->nivel,
+                'interno' => $request->interno,
+                'nivel' => $nivelRequerido,
                 'estado' => $request->estado,
             ]);
+
+            // Actualizar solo los hijos directos
+            foreach ($unidad->unidadesHijas as $hijo) {
+                $hijo->update(['nivel' => $nivelRequerido + 1]);
+            }
 
             return response()->json([
                 'message' => 'Unidad actualizada correctamente',
                 'unidad' => $unidad
             ]);
+
         } catch (Exception $e) {
             return response()->json([
                 'message' => "Error inesperado: " . $e->getMessage()
             ], 500);
         }
     }
+
     public function destroy(Unidad $unidad)
     {
         try {
-            $unidad->delete();
+            $deleted = $unidad->safeDelete(); // usa la función del modelo
 
             return response()->json([
                 'success' => true,
-                'message' => 'Unidad eliminada correctamente.'
+                'message' => $deleted
+                    ? 'Unidad eliminada correctamente.'
+                    : 'La unidad tiene dependencias, se marcó como ANULADO.'
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Error al eliminar la unidad: ' . $e->getMessage()
             ], 500);
         }
     }
+    public function showTree($unidadId = null)
+    {
+        if ($unidadId) {
+            $unit = Unidad::findOrFail($unidadId);
+
+            // Obtenemos la unidad como raíz y sus hijos
+            $tree = [Unidad::getTree($unit->id)]; // Lo envolvemos en un array para mantener consistencia
+        } else {
+            // Obtenemos todo el árbol desde los nodos raíz
+            $tree = Unidad::getTree();
+        }
+
+        return view('admin.unidades.organigrama', compact('tree', 'unidadId'));
+    }
+
 
 }

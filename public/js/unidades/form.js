@@ -54,12 +54,18 @@ $(document).ready(function () {
                     title: '¡Éxito!',
                     text: data.message || (unidadId ? 'Unidad actualizada correctamente' : 'Unidad creada con éxito'),
                     timer: 2000,
+                    timerProgressBar: true,
                     showConfirmButton: false,
-                    toast: true,
-                    position: 'top-end'
+                    position: 'center',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    allowEnterKey: false,
+                    backdrop: true,
+                    ...swalStyles()
                 }).then(() => {
                     window.location.href = '/admin/unidades';
                 });
+
             },
             error: function (xhr) {
                 // Detener spinner

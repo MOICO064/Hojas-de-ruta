@@ -35856,8 +35856,3 @@ div.table-responsive>div.dataTables_wrapper>div.row {
     to { transform: rotate(360deg); }
 }
 
-/* Child row FULL ancho */
-table.dataTable tr.child td.child {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-}

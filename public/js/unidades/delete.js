@@ -1,18 +1,19 @@
 function eliminarUnidad(id) {
-    const isDark = $('body').hasClass('theme-dark'); 
+    const primaryColor = '#5e72e4'; // tu color primario
+    const secondaryColor = '#6c757d'; // color secundario
+
     Swal.fire({
         title: '¿Estás seguro?',
         text: "¡Esta acción no se puede deshacer!",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
+        confirmButtonColor: primaryColor,
+        cancelButtonColor: secondaryColor,
         confirmButtonText: 'Sí, eliminar',
         cancelButtonText: 'Cancelar',
         reverseButtons: true,
         focusCancel: true,
-        background: isDark ? '#1E1E2D' : '#fff',
-        color: isDark ? '#fff' : '#000'
+        ...swalStyles()
     }).then((result) => {
         if (result.isConfirmed) {
             const swalBtn = Swal.getConfirmButton();
@@ -24,7 +25,7 @@ function eliminarUnidad(id) {
                 type: 'DELETE',
                 headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                 success: function (response) {
-                    Swal.close(); // Cierra confirmación
+                    Swal.close();
 
                     Swal.fire({
                         icon: response.success ? 'success' : 'error',
@@ -33,14 +34,15 @@ function eliminarUnidad(id) {
                         toast: true,
                         position: 'top-end',
                         timer: 3000,
+                        timerProgressBar: true,
                         showConfirmButton: false,
-                        background: isDark ? '#1E1E2D' : '#fff',
-                        color: isDark ? '#fff' : '#000'
-                    });
+                        ...swalStyles(),
 
-                    if (response.success) {
+                    });
+                    if (response) { 
                         $('#unidades-table').DataTable().ajax.reload(null, false);
                     }
+
                 },
                 error: function (xhr) {
                     let message = xhr.responseJSON?.message || 'Error desconocido. Revisa la consola.';
@@ -52,8 +54,8 @@ function eliminarUnidad(id) {
                         position: 'top-end',
                         timer: 5000,
                         showConfirmButton: false,
-                        background: isDark ? '#1E1E2D' : '#fff',
-                        color: isDark ? '#fff' : '#000'
+                        timerProgressBar: true,
+                        ...swalStyles()
                     });
                 },
                 complete: function () {

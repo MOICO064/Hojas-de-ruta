@@ -37,6 +37,10 @@ Route::prefix('admin/unidades')->group(function () {
 
     Route::get('/data', [UnidadController::class, 'data'])
         ->name('admin.unidades.data');
+    Route::get('/tree', [UnidadController::class, 'showTree'])
+        ->name('admin.unidades.showTree');
+    Route::get('/tree/{unidad}', [UnidadController::class, 'showTree'])
+        ->name('admin.unidad.showTree');
 });
 
 

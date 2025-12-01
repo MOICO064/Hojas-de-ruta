@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 class Funcionario extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
     protected $table = 'funcionarios';
 
@@ -57,5 +58,13 @@ class Funcionario extends Model
     public function hojasRutaSolicitante()
     {
         return $this->hasMany(HojaRuta::class, 'solicitante', 'id');
+    }
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('funcionario') // Nombre legible del log
+            ->logOnly(['unidad_id', 'ci', 'nombre', 'cargo', 'nro_item', 'estado', 'celular']) // Campos a registrar
+            ->logOnlyDirty() // Solo cambios
+            ->setDescriptionForEvent(fn(string $eventName) => "Funcionario {$this->nombre} ha sido {$eventName}");
     }
 }

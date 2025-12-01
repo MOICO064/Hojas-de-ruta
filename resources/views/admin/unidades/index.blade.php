@@ -12,6 +12,13 @@
                 <span class="d-none d-md-inline">Crear Unidad</span>
                 <i data-feather="plus" class="d-inline d-md-none"></i>
             </a>
+            <!-- Botón Ver Organigrama -->
+            <a href="{{ route('admin.unidades.showTree') }}" class="btn btn-info d-flex align-items-center"
+                title="Ver Organigrama">
+                <i data-feather="layout" class="me-2 icon-xxs d-none d-md-inline"></i>
+                <span class="d-none d-md-inline">Organigrama</span>
+                <i data-feather="layout" class="d-inline d-md-none"></i>
+            </a>
 
             <!-- Botón Actualizar Tabla -->
             <button type="button" id="refresh-table" class="btn btn-secondary d-flex align-items-center"
@@ -60,9 +67,10 @@
                 </div>
             </div>
         </div>
+    </div>
 @endsection
 
 @section('scripts')
     <script src="{{ asset('js/unidades/index.js') }}"></script>
     <script src="{{ asset('js/unidades/delete.js') }}"></script>
- @endsection
+@endsection

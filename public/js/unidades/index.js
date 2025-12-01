@@ -6,14 +6,14 @@ $(document).ready(function () {
         responsive: {
             details: {
                 type: 'inline',
-                display: $.fn.dataTable.Responsive.display.childRowImmediate,
+                display: $.fn.dataTable.Responsive.display.childRow,
                 renderer: function (api, rowIdx, columns) {
                     let data = $.map(columns, function (col) {
                         return col.hidden
                             ? `<tr>
-                                <td><strong>${col.title}</strong></td>
-                                <td>${col.data}</td>
-                               </tr>`
+                        <td><strong>${col.title}</strong></td>
+                        <td>${col.data}</td>
+                       </tr>`
                             : '';
                     }).join('');
 
@@ -31,7 +31,7 @@ $(document).ready(function () {
                 <"dt-right d-flex " f>
             >
             rt
-            <"dt-bottom-container d-flex flex-wrap justify-content-center gap-2"
+            <"dt-bottom-container d-flex flex-wrap justify-content-center justify-content-md-between"
                 <"dt-info text-center" i>
                 <"dt-paginate text-center" p>
             >
@@ -52,7 +52,7 @@ $(document).ready(function () {
         ],
 
         language: {
-            url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+            url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
         }
     });
 
@@ -79,7 +79,15 @@ $(document).ready(function () {
         });
     });
 
-    if (typeof feather !== 'undefined') {
-        feather.replace();
-    }
+    table.on('draw.dt', function () {
+        if (typeof feather !== 'undefined') {
+            feather.replace();
+        }
+    });
+    table.on('responsive-display.dt', function () {
+        if (typeof feather !== 'undefined') {
+            feather.replace();
+        }
+    });
+
 });
