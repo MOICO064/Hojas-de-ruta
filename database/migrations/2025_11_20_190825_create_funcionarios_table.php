@@ -23,7 +23,7 @@ return new class extends Migration {
         });
         Schema::table('users', function (Blueprint $table) {
             $table->foreignId('funcionario_id')->nullable()->constrained('funcionarios')->nullOnDelete();
-            $table->enum('estado', ['ACTIVO', 'ANULADO'])->default('ACTIVO');
+            $table->enum('estado', ['ACTIVO', 'INACTIVO'])->default('ACTIVO');
         });
 
     }

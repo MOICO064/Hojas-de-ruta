@@ -133,7 +133,7 @@ class Unidad extends Model
 
                 $authUser = auth()->user();
                 $authUserId = $authUser?->id;
-                $authUserName = $authUser?->name;
+                $authUserName = $authUser?->email;
 
                 $relatedUser = $this->user ?? null;
                 $relatedUserId = $relatedUser?->id;

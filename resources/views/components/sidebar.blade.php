@@ -18,6 +18,13 @@
                     Dashboard
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link has-arrow {{ request()->is('admin/usuarios*') ? 'active' : '' }}"
+                    href="{{ route('admin.usuarios.index') }}">
+                    <i data-feather="user" class="nav-icon me-2 icon-xxs"></i>
+                    Usuarios
+                </a>
+            </li>
 
             <li class="nav-item">
                 <a class="nav-link has-arrow {{ request()->is('admin/unidades*') ? 'active' : '' }}"

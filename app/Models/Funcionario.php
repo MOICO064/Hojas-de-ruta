@@ -69,7 +69,7 @@ class Funcionario extends Model
             ->setDescriptionForEvent(function (string $eventName) {
                 $authUser = auth()->user();
                 $authUserId = $authUser?->id;
-                $authUserName = $authUser?->name;
+                $authUserName = $authUser?->email;
 
                 $relatedUser = $this->user;
                 $relatedUserId = $relatedUser?->id;

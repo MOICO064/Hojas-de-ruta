@@ -1,9 +1,11 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UnidadController;
 use App\Http\Controllers\FuncionarioController;
+use App\Http\Controllers\UsuarioController;
+use App\Http\Middleware\CheckUserActive;
+
 
 Route::get('/', function () {
     return redirect('login');
@@ -11,10 +13,10 @@ Route::get('/', function () {
 
 Route::get('/dashboard', function () {
     return view('admin.index');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth', 'verified', 'active'])->name('dashboard');
 
 //  , 'can:admin.unidades'
-Route::prefix('admin/unidades')->middleware(['auth', 'verified'])->group(function () {
+Route::prefix('admin/unidades')->middleware(['auth', 'verified', 'active'])->group(function () {
     Route::get('/', [UnidadController::class, 'index'])->name('admin.unidades.index');
     // ->middleware('can:admin.unidades.create')
     Route::get('/crear', [UnidadController::class, 'create'])
@@ -44,7 +46,7 @@ Route::prefix('admin/unidades')->middleware(['auth', 'verified'])->group(functio
         ->name('admin.unidad.showTree');
 });
 // , 'can:admin.funcionarios'
-Route::prefix('admin/funcionarios')->middleware(['auth', 'verified'])->group(function () {
+Route::prefix('admin/funcionarios')->middleware(['auth', 'verified', 'active'])->group(function () {
     Route::get('/', [FuncionarioController::class, 'index'])
         ->name('admin.funcionarios.index');
 
@@ -67,5 +69,27 @@ Route::prefix('admin/funcionarios')->middleware(['auth', 'verified'])->group(fun
         ->name('admin.funcionarios.data');
 });
 
+// , 'can:admin.usuarios'
+Route::prefix('admin/usuarios')->middleware(['auth', 'verified', 'active'])->group(function () {
+    Route::get('/', [UsuarioController::class, 'index'])
+        ->name('admin.usuarios.index');
 
+    Route::get('/crear', [UsuarioController::class, 'create'])
+        ->name('admin.usuarios.create');
+
+    Route::post('/', [UsuarioController::class, 'store'])
+        ->name('admin.usuarios.store');
+
+    Route::get('/{user}/editar', [UsuarioController::class, 'edit'])
+        ->name('admin.usuarios.edit');
+
+    Route::put('/{user}', [UsuarioController::class, 'update'])
+        ->name('admin.usuarios.update');
+
+    Route::delete('/{user}', [UsuarioController::class, 'destroy'])
+        ->name('admin.usuarios.destroy');
+
+    Route::get('/data', [UsuarioController::class, 'data'])
+        ->name('admin.usuarios.data');
+});
 require __DIR__ . '/auth.php';
