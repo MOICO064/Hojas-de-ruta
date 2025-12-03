@@ -3,7 +3,7 @@
 <div class="navbar-vertical navbar nav-dashboard">
     <div class="h-100" data-simplebar>
         <!-- Brand logo -->
-        <a class="navbar-brand" href="">
+        <a class="navbar-brand" href="{{ route('dashboard') }}">
             <img src="{{ asset('assets/images/recurces/gamc-320x128-23.png') }}" alt="logo" />
         </a>
 

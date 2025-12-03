@@ -6,15 +6,15 @@ use App\Http\Controllers\UnidadController;
 use App\Http\Controllers\FuncionarioController;
 
 Route::get('/', function () {
-    return view('layouts.app');
+    return redirect('login');
 });
 
 Route::get('/dashboard', function () {
     return view('admin.index');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-//  ->middleware(['auth', 'verified', 'can:admin.unidades'])
-Route::prefix('admin/unidades')->group(function () {
+//  , 'can:admin.unidades'
+Route::prefix('admin/unidades')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/', [UnidadController::class, 'index'])->name('admin.unidades.index');
     // ->middleware('can:admin.unidades.create')
     Route::get('/crear', [UnidadController::class, 'create'])
@@ -43,8 +43,8 @@ Route::prefix('admin/unidades')->group(function () {
     Route::get('/tree/{unidad}', [UnidadController::class, 'showTree'])
         ->name('admin.unidad.showTree');
 });
-
-Route::prefix('admin/funcionarios')->group(function () {
+// , 'can:admin.funcionarios'
+Route::prefix('admin/funcionarios')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/', [FuncionarioController::class, 'index'])
         ->name('admin.funcionarios.index');
 

@@ -21,7 +21,7 @@
     </script>
 
     <!-- Favicon icon-->
-    <link rel="shortcut icon" type="image/x-icon" href="../assets/images/favicon/favicon.ico" />
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('assets/images/recurces/escudo.png') }}" />
 
     <!-- Color modes -->
     <script src="{{ asset('assets/js/vendors/color-modes.js') }}"></script>

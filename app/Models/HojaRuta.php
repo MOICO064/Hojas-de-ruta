@@ -17,6 +17,8 @@ class HojaRuta extends Model
     protected $fillable = [
         'idgral',
         'numero_unidad',
+        'externo',
+        'nombre_solicitante',
         'unidad_origen_id',
         'solicitante_id',
         'fecha_creacion',
@@ -37,6 +39,7 @@ class HojaRuta extends Model
         'fecha_creacion' => 'date',
         'fecha_impresion' => 'datetime',
         'fojas' => 'integer',
+        'externo' => 'boolean', // Nuevo
     ];
 
     /**
@@ -48,7 +51,8 @@ class HojaRuta extends Model
     }
 
     /**
-     * Solicitante (funcionario)
+     * Solicitante interno (funcionario)
+     * Si es externo, este campo queda null.
      */
     public function solicitante()
     {

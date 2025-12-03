@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('funcionarios', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('unidad_id')->constrained('unidades')->nullOnDelete();
+            $table->foreignId('unidad_id')->constrained('unidades');
             $table->string('ci', 20);
             $table->string('nombre');
             $table->string('cargo')->nullable();
@@ -23,7 +23,7 @@ return new class extends Migration {
         });
         Schema::table('users', function (Blueprint $table) {
             $table->foreignId('funcionario_id')->nullable()->constrained('funcionarios')->nullOnDelete();
-            $table->string('estado');
+            $table->enum('estado', ['ACTIVO', 'ANULADO'])->default('ACTIVO');
         });
 
     }

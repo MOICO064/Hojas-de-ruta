@@ -2,7 +2,7 @@
 <div class="navbar-custom navbar navbar-expand-lg">
     <div class="container-fluid px-0">
         <a class="navbar-brand d-block d-md-none" href="../index.html">
-            <img src="{{asset('assets/images/recurces/gamc-320x128-23.png')}}" alt="Image" style="width:100px"/>
+            <img src="{{asset('assets/images/recurces/gamc-320x128-23.png')}}" alt="Image" style="width:100px" />
         </a>
 
         <a id="nav-toggle" href="#!" class="ms-auto ms-md-0 me-0 me-lg-3">
@@ -130,14 +130,23 @@
                 <a class="rounded-circle" href="#!" role="button" id="dropdownUser" data-bs-toggle="dropdown"
                     aria-haspopup="true" aria-expanded="false">
                     <div class="avatar avatar-md avatar-indicators avatar-online">
-                        <img alt="avatar" src="{{ asset('assets/images/avatars/default.png') }}" class="rounded-circle" />
+                        <img alt="avatar" src="{{ asset('assets/images/avatars/default.png') }}"
+                            class="rounded-circle" />
                     </div>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownUser">
                     <div class="px-4 pb-0 pt-2">
                         <div class="lh-1">
-                            <h5 class="mb-1">Nombre Usuario</h5>
-                            <h3 class=" fs-6">Unidad Pertenece</h3>
+                            <h4 class="mb-1">
+                                {{ auth()->user()?->funcionario?->nombre ?? 'Usuario no autenticado' }}
+                            </h4>
+                            <h3 class="fs-6">
+                                Unidad: {{ auth()->user()?->funcionario?->unidad?->nombre ?? 'Sin unidad' }}
+                            </h3>
+                            <h3 class="fs-6">
+                                Rol: {{ auth()->user()?->getRoleNames()->first() ?? 'Sin rol' }}
+                            </h3>
+
                         </div>
                         <div class="dropdown-divider mt-3 mb-2"></div>
                     </div>
@@ -157,11 +166,17 @@
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="../index.html">
+                            <a class="dropdown-item" href="#"
+                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                 <i class="me-2 icon-xxs dropdown-item-icon" data-feather="power"></i>
                                 Cerrar Sesión
                             </a>
+
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                @csrf
+                            </form>
                         </li>
+
                     </ul>
                 </div>
             </li>
