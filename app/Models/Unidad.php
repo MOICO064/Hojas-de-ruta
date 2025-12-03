@@ -117,7 +117,7 @@ class Unidad extends Model
         if ($this->unidadesHijas()->count() || $this->funcionarios()->count() || $this->hojasRutaOrigen()->count()) {
             $this->estado = 'ANULADO';
             $this->save();
-            return false; 
+            return false;
         }
 
         $this->delete();
@@ -129,6 +129,21 @@ class Unidad extends Model
             ->useLogName('unidad')
             ->logOnly(['nombre', 'jefe', 'codigo', 'nivel', 'estado'])
             ->logOnlyDirty()
-            ->setDescriptionForEvent(fn(string $eventName) => "Unidad {$this->nombre} ha sido {$eventName}");
+            ->setDescriptionForEvent(function (string $eventName) {
+
+                $authUser = auth()->user();
+                $authUserId = $authUser?->id;
+                $authUserName = $authUser?->name;
+
+                $relatedUser = $this->user ?? null;
+                $relatedUserId = $relatedUser?->id;
+                $relatedUserName = $relatedUser?->usuario;
+
+                return "Unidad: {$this->nombre} | "
+                    . "Evento: {$eventName} | "
+                    . "Usuario relacionado: " . ($relatedUserName ? "{$relatedUserName} ({$relatedUserId})" : "null") . " | "
+                    . "Realizado por: " . ($authUser ? "{$authUserName} ({$authUserId})" : "null");
+            });
     }
+
 }

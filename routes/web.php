@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UnidadController;
+use App\Http\Controllers\FuncionarioController;
 
 Route::get('/', function () {
     return view('layouts.app');
@@ -41,6 +42,29 @@ Route::prefix('admin/unidades')->group(function () {
         ->name('admin.unidades.showTree');
     Route::get('/tree/{unidad}', [UnidadController::class, 'showTree'])
         ->name('admin.unidad.showTree');
+});
+
+Route::prefix('admin/funcionarios')->group(function () {
+    Route::get('/', [FuncionarioController::class, 'index'])
+        ->name('admin.funcionarios.index');
+
+    Route::get('/crear', [FuncionarioController::class, 'create'])
+        ->name('admin.funcionarios.create');
+
+    Route::post('/', [FuncionarioController::class, 'store'])
+        ->name('admin.funcionarios.store');
+
+    Route::get('/{funcionario}/editar', [FuncionarioController::class, 'edit'])
+        ->name('admin.funcionarios.edit');
+
+    Route::put('/{funcionario}', [FuncionarioController::class, 'update'])
+        ->name('admin.funcionarios.update');
+
+    Route::delete('/{funcionario}', [FuncionarioController::class, 'destroy'])
+        ->name('admin.funcionarios.destroy');
+
+    Route::get('/data', [FuncionarioController::class, 'data'])
+        ->name('admin.funcionarios.data');
 });
 
 

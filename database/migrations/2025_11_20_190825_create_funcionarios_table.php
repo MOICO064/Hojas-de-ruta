@@ -12,12 +12,12 @@ return new class extends Migration {
     {
         Schema::create('funcionarios', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('unidad_id')->nullable()->constrained('unidades')->nullOnDelete();
+            $table->foreignId('unidad_id')->constrained('unidades')->nullOnDelete();
             $table->string('ci', 20);
             $table->string('nombre');
             $table->string('cargo')->nullable();
             $table->string('nro_item')->nullable();
-            $table->string('estado');
+            $table->enum('estado', ['ACTIVO', 'ANULADO'])->default('ACTIVO');
             $table->string('celular', 30)->nullable();
             $table->timestamps();
         });

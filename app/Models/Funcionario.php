@@ -20,6 +20,7 @@ class Funcionario extends Model
         'ci',
         'nombre',
         'cargo',
+        'nro_item',
         'estado',
         'celular',
     ];
@@ -57,14 +58,28 @@ class Funcionario extends Model
      */
     public function hojasRutaSolicitante()
     {
-        return $this->hasMany(HojaRuta::class, 'solicitante', 'id');
+        return $this->hasMany(HojaRuta::class, 'solicitante_id', 'id');
     }
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->useLogName('funcionario') // Nombre legible del log
-            ->logOnly(['unidad_id', 'ci', 'nombre', 'cargo', 'nro_item', 'estado', 'celular']) // Campos a registrar
-            ->logOnlyDirty() // Solo cambios
-            ->setDescriptionForEvent(fn(string $eventName) => "Funcionario {$this->nombre} ha sido {$eventName}");
+            ->useLogName('funcionario')
+            ->logOnly(['unidad_id', 'ci', 'nombre', 'cargo', 'nro_item', 'estado', 'celular'])
+            ->logOnlyDirty()
+            ->setDescriptionForEvent(function (string $eventName) {
+                $authUser = auth()->user();
+                $authUserId = $authUser?->id;
+                $authUserName = $authUser?->name;
+
+                $relatedUser = $this->user;
+                $relatedUserId = $relatedUser?->id;
+                $relatedUserUsername = $relatedUser?->usuario;
+                $relatedFuncionarioName = $relatedUser?->funcionario?->nombre ?? $this->nombre;
+
+                return "Funcionario: {$relatedFuncionarioName} | Usuario relacionado: {$relatedUserUsername} ({$relatedUserId}) | Evento: {$eventName} | Realizado por: " .
+                    ($authUser ? "{$authUserName} ({$authUserId})" : "null");
+            });
     }
+
+
 }

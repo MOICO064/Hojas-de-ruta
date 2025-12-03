@@ -26,6 +26,13 @@
                     Unidades
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link has-arrow {{ request()->is('admin/funcionarios*') ? 'active' : '' }}"
+                    href="{{ route('admin.funcionarios.index') }}">
+                    <i data-feather="users" class="nav-icon me-2 icon-xxs"></i>
+                    Funcionarios
+                </a>
+            </li>
 
 
             <div class="d-none">

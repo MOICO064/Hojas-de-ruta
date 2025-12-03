@@ -14,8 +14,13 @@ return new class extends Migration {
             $table->id();
             $table->string('idgral', 50);
             $table->string('numero_unidad', 10);
+
+            $table->boolean('externo')->default(false);
+            $table->string('nombre_solicitante')->nullable();
+
             $table->foreignId('unidad_origen_id')->constrained('unidades');
-            $table->foreignId('solicitante_id')->constrained('funcionarios');
+            $table->foreignId('solicitante_id')->nullable()->constrained('funcionarios');
+
             $table->date('fecha_creacion');
             $table->string('cite')->nullable();
             $table->string('prioridad', 20)->default('normal');
@@ -29,12 +34,11 @@ return new class extends Migration {
         });
     }
 
-
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('hoja_rutas');
+        Schema::dropIfExists('hoja_ruta');
     }
 };
