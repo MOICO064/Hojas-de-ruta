@@ -4,7 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UnidadController;
 use App\Http\Controllers\FuncionarioController;
 use App\Http\Controllers\UsuarioController;
-use App\Http\Middleware\CheckUserActive;
+use App\Http\Controllers\RolesAndPermisosController;
+use App\Http\Controllers\HojaRutaController;
 
 
 Route::get('/', function () {
@@ -92,4 +93,110 @@ Route::prefix('admin/usuarios')->middleware(['auth', 'verified', 'active'])->gro
     Route::get('/data', [UsuarioController::class, 'data'])
         ->name('admin.usuarios.data');
 });
+
+Route::prefix('admin/roles-permisos')->middleware(['auth', 'verified', 'active'])->group(function () {
+
+    // =================================
+    //             ROLES
+    // =================================
+
+    // Listado de roles
+    Route::get('/roles', [RolesAndPermisosController::class, 'rolesIndex'])
+        ->name('admin.roles.index');
+
+    // Crear rol
+    Route::get('/roles/crear', [RolesAndPermisosController::class, 'rolesCreate'])
+        ->name('admin.roles.create');
+
+    Route::post('/roles', [RolesAndPermisosController::class, 'rolesStore'])
+        ->name('admin.roles.store');
+
+    // Editar rol
+    Route::get('/roles/{role}/editar', [RolesAndPermisosController::class, 'rolesEdit'])
+        ->name('admin.roles.edit');
+
+    Route::put('/roles/{role}', [RolesAndPermisosController::class, 'rolesUpdate'])
+        ->name('admin.roles.update');
+
+    Route::delete('/roles/{role}', [RolesAndPermisosController::class, 'rolesDestroy'])
+        ->name('admin.roles.destroy');
+
+    Route::get('/roles/data', [RolesAndPermisosController::class, 'rolesData'])
+        ->name('admin.roles.data');
+
+    Route::get('/roles/{role}/permisos', [RolesAndPermisosController::class, 'permisos'])
+        ->name('admin.roles.permisos');
+    // Acción del switch (toggle)
+    Route::post('/roles/{role}/permisos/{permission}', [RolesAndPermisosController::class, 'togglePermiso'])
+        ->name('admin.roles.permisos.toggle');
+    Route::post('/roles/{role}/asignar/permisos', [RolesAndPermisosController::class, 'asignarTodos']);
+    Route::post('/roles/{role}/quitar/permisos', [RolesAndPermisosController::class, 'quitarTodos']);
+
+    // =================================
+    //            PERMISOS
+    // =================================
+
+    // Vista principal (lista infinita)
+    Route::get('/permisos', [RolesAndPermisosController::class, 'permisosIndex'])
+        ->name('admin.permisos.index');
+
+    // Crear permiso
+    Route::get('/permisos/crear', [RolesAndPermisosController::class, 'permisosCreate'])
+        ->name('admin.permisos.create');
+
+    Route::post('/permisos', [RolesAndPermisosController::class, 'permisosStore'])
+        ->name('admin.permisos.store');
+
+    // Editar permiso
+    Route::get('/permisos/{permission}/editar', [RolesAndPermisosController::class, 'permisosEdit'])
+        ->name('admin.permisos.edit');
+
+    Route::put('/permisos/{permission}', [RolesAndPermisosController::class, 'permisosUpdate'])
+        ->name('admin.permisos.update');
+
+    // Eliminar permiso
+    Route::delete('/permisos/{permission}', [RolesAndPermisosController::class, 'permisosDestroy'])
+        ->name('admin.permisos.destroy');
+
+    Route::get('/permisos/data', [RolesAndPermisosController::class, 'permisosData'])
+        ->name('admin.permisos.data');
+
+});
+
+
+Route::prefix('admin/hojaruta')->middleware(['auth', 'verified', 'active'])->group(function () {
+
+    // Lista general o por gestión
+    Route::get('/{gestion?}/gestion', [HojaRutaController::class, 'index'])
+        ->name('admin.hojaruta.index');
+
+    // Crear nueva hoja de ruta
+    Route::get('/crear', [HojaRutaController::class, 'create'])
+        ->name('admin.hojaruta.create');
+
+    Route::post('/', [HojaRutaController::class, 'store'])
+        ->name('admin.hojaruta.store');
+
+    // Editar hoja de ruta
+    Route::get('/{hoja}/editar', [HojaRutaController::class, 'edit'])
+        ->name('admin.hojaruta.edit');
+
+    Route::put('/{hoja}', [HojaRutaController::class, 'update'])
+        ->name('admin.hojaruta.update');
+
+    // Eliminar hoja de ruta
+    Route::delete('/{hoja}', [HojaRutaController::class, 'destroy'])
+        ->name('admin.hojaruta.destroy');
+
+    // DataTable AJAX, opcionalmente filtrado por gestión
+    Route::get('/data/{gestion?}', [HojaRutaController::class, 'data'])
+        ->name('admin.hojaruta.data');
+
+    // Mostrar hoja de ruta individual
+    Route::get('/{hoja}', [HojaRutaController::class, 'show'])
+        ->name('admin.hojaruta.show');
+
+});
+
+
 require __DIR__ . '/auth.php';

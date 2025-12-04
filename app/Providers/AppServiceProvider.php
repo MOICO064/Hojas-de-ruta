@@ -5,7 +5,8 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\CheckUserActive;
-
+use Illuminate\Support\Facades\View;
+use App\Models\HojaRuta;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -23,5 +24,9 @@ class AppServiceProvider extends ServiceProvider
     {
 
         Route::aliasMiddleware('active', CheckUserActive::class);
+        View::composer('components.sidebar', function ($view) {
+            $gestiones = HojaRuta::select('gestion')->distinct()->orderByDesc('gestion')->pluck('gestion');
+            $view->with('gestiones', $gestiones);
+        });
     }
 }

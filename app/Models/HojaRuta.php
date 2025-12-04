@@ -72,7 +72,7 @@ class HojaRuta extends Model
      */
     public function derivaciones()
     {
-        return $this->hasMany(Derivacion::class, 'idhoja', 'id');
+        return $this->hasMany(Derivacion::class, 'hoja_id', 'id');
     }
 
     /**
