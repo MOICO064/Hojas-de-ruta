@@ -55,6 +55,7 @@
                                     <th>Teléfono</th>
                                     <th>Interno</th>
                                     <th>Nivel</th>
+                                    <th>Total Hojas</th>
                                     <th>Subunidades</th>
                                     <th>Estado</th>
                                     <th>Acciones</th>

@@ -15,10 +15,13 @@ return new class extends Migration {
             $table->foreignId('hoja_id')->constrained('hoja_ruta')->cascadeOnDelete();
             $table->foreignId('unidad_origen_id')->constrained('unidades');
             $table->foreignId('unidad_destino_id')->constrained('unidades');
+            $table->foreignId('funcionario_id')->nullable()->constrained('funcionarios')->nullOnDelete();
             $table->text('descripcion')->nullable();
-            $table->string('estado')->default('Revision');
+            $table->enum('estado', ['DERIVADO', 'RECEPCIONADO', 'PENDIENTE', 'CONCLUIDO', 'ANULADO'])->default('PENDIENTE');
             $table->foreignId('derivado_por')->constrained(table: 'funcionarios');
-
+            $table->string('pdf')->nullable();
+            $table->string('fileid')->nullable();
+            $table->integer('fojas')->nullable();
             $table->timestamp('fecha_derivacion')->nullable();
             $table->timestamp('fecha_recepcion')->nullable();
             $table->timestamps();

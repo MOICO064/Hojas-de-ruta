@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class HojaRuta extends Model
 {
@@ -23,11 +24,10 @@ class HojaRuta extends Model
         'solicitante_id',
         'fecha_creacion',
         'cite',
-        'prioridad',
+        'urgente',
         'asunto',
         'estado',
         'gestion',
-        'fojas',
         'creado_por',
         'fecha_impresion',
     ];
@@ -38,8 +38,8 @@ class HojaRuta extends Model
     protected $casts = [
         'fecha_creacion' => 'date',
         'fecha_impresion' => 'datetime',
-        'fojas' => 'integer',
-        'externo' => 'boolean', // Nuevo
+        'externo' => 'boolean',
+        'urgente' => 'boolean',
     ];
 
     /**
@@ -52,7 +52,6 @@ class HojaRuta extends Model
 
     /**
      * Solicitante interno (funcionario)
-     * Si es externo, este campo queda null.
      */
     public function solicitante()
     {
@@ -60,11 +59,11 @@ class HojaRuta extends Model
     }
 
     /**
-     * Usuario/funcionario que creó la hoja de ruta
+     * Usuario que creó la hoja de ruta
      */
     public function creador()
     {
-        return $this->belongsTo(Funcionario::class, 'creado_por', 'id');
+        return $this->belongsTo(User::class, 'creado_por', 'id');
     }
 
     /**
@@ -82,4 +81,5 @@ class HojaRuta extends Model
     {
         return $this->hasMany(Anulacion::class, 'idhoja', 'id');
     }
+
 }

@@ -82,10 +82,55 @@
                     Funcionarios
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link has-arrow {{ request()->is('admin/hojaruta/crear') ? 'active' : '' }}"
+                    href="{{ route('admin.hojaruta.create') }}">
+                    <i data-feather="file-text" class="nav-icon me-2 icon-xxs"></i>
+                    Crear Hoja de Ruta
+                </a>
+            </li>
+            <!-- Nav item: Buzón -->
+            <li class="nav-item">
+                <a class="nav-link has-arrow 
+        {{ request()->routeIs('admin.buzon.*') ? '' : 'collapsed' }}" href="#!" data-bs-toggle="collapse"
+                    data-bs-target="#navBuzon"
+                    aria-expanded="{{ request()->routeIs('admin.buzon.*') ? 'true' : 'false' }}"
+                    aria-controls="navBuzon">
+
+                    <i data-feather="mail" class="nav-icon me-2 icon-xxs"></i>
+                    Buzón
+                </a>
+
+                <div id="navBuzon" class="collapse {{ request()->routeIs('admin.buzon.*') ? 'show' : '' }}"
+                    data-bs-parent="#sideNavbar">
+
+                    <ul class="nav flex-column">
+
+                        <!-- Entrada -->
+                        <li class="nav-item">
+                            <a class="nav-link 
+                    {{ request()->routeIs('admin.buzon.entrada') ? 'active' : '' }}"
+                                href="{{ route('admin.buzon.entrada') }}">
+                                Entrada
+                            </a>
+                        </li>
+
+                        <!-- Salida -->
+                        <li class="nav-item">
+                            <a class="nav-link 
+                    {{ request()->routeIs('admin.buzon.salida') ? 'active' : '' }}"
+                                href="{{ route('admin.buzon.salida') }}">
+                                Salida
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+            </li>
 
             @foreach($gestiones as $gestion)
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->is('admin/hojaruta/' . $gestion.'/gestion') ? 'active' : '' }}"
+                    <a class="nav-link {{ request()->is('admin/hojaruta/' . $gestion . '/gestion') ? 'active' : '' }}"
                         href="{{ route('admin.hojaruta.index', $gestion) }}">
                         <i data-feather="file-text" class="nav-icon me-2 icon-xxs"></i>
                         Gestión {{ $gestion }}

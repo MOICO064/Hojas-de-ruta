@@ -21,9 +21,9 @@ class Unidad extends Model
         'telefono',
         'interno',
         'nivel',
+        'numero_unidad_actual',
         'estado',
     ];
-
 
     /**
      * Unidad padre (para estructura jerárquica)
@@ -57,34 +57,32 @@ class Unidad extends Model
         return $this->hasMany(HojaRuta::class, 'unidad_origen_id');
     }
 
+    /**
+     * Obtener estructura jerárquica de unidades
+     */
     public static function getTree($id = null)
     {
-        // Si se pasa un ID específico
         if ($id) {
             $unit = self::where('id', $id)
                 ->where('estado', 'ACTIVO')
                 ->first();
 
-            if (!$unit) {
-                return []; // No existe o no está activa
-            }
+            if (!$unit)
+                return [];
 
             return [
                 'id' => $unit->id,
                 'nombre' => $unit->nombre,
                 'jefe' => $unit->jefe,
                 'nivel' => $unit->nivel,
-                'children' => self::getTreeChildren($unit->id)
+                'numero_unidad_actual' => $unit->numero_unidad_actual,
+                'children' => self::getTreeChildren($unit->id),
             ];
         }
 
-        // Si no se pasa ID, devolvemos todo desde los nodos raíz
         return self::getTreeChildren();
     }
 
-    /**
-     * Función auxiliar para obtener hijos recursivamente
-     */
     private static function getTreeChildren($parentId = null)
     {
         $units = self::where('unidad_padre_id', $parentId)
@@ -100,14 +98,13 @@ class Unidad extends Model
                 'nombre' => $unit->nombre,
                 'jefe' => $unit->jefe,
                 'nivel' => $unit->nivel,
-                'children' => self::getTreeChildren($unit->id)
+                'numero_unidad_actual' => $unit->numero_unidad_actual,
+                'children' => self::getTreeChildren($unit->id),
             ];
         }
 
         return $result;
     }
-
-
 
     /**
      * Eliminación segura: si tiene dependencias, solo cambia a ANULADO
@@ -123,27 +120,23 @@ class Unidad extends Model
         $this->delete();
         return true;
     }
+
+    /**
+     * Opciones de log de actividad
+     */
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
             ->useLogName('unidad')
-            ->logOnly(['nombre', 'jefe', 'codigo', 'nivel', 'estado'])
+            ->logOnly(['nombre', 'jefe', 'codigo', 'nivel', 'numero_unidad_actual', 'estado'])
             ->logOnlyDirty()
             ->setDescriptionForEvent(function (string $eventName) {
-
                 $authUser = auth()->user();
                 $authUserId = $authUser?->id;
                 $authUserName = $authUser?->email;
 
-                $relatedUser = $this->user ?? null;
-                $relatedUserId = $relatedUser?->id;
-                $relatedUserName = $relatedUser?->usuario;
-
-                return "Unidad: {$this->nombre} | "
-                    . "Evento: {$eventName} | "
-                    . "Usuario relacionado: " . ($relatedUserName ? "{$relatedUserName} ({$relatedUserId})" : "null") . " | "
-                    . "Realizado por: " . ($authUser ? "{$authUserName} ({$authUserId})" : "null");
+                return "Unidad: {$this->nombre} | Evento: {$eventName} | Realizado por: "
+                    . ($authUser ? "{$authUserName} ({$authUserId})" : "null");
             });
     }
-
 }

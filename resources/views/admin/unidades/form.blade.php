@@ -34,7 +34,7 @@
                         {{-- Unidad Padre --}}
                         <div class="mb-3">
                             <label class="form-label d-flex align-items-center gap-2">
-                                <i data-feather="git-branch"></i> Unidad Padre
+                                <i data-feather="git-branch"></i> Unidad Padre (opcional)
                             </label>
                             <select name="unidad_padre_id" id="unidad_padre_id" class="form-select">
                                 <option value="">-- Ninguna --</option>
@@ -51,7 +51,7 @@
                         {{-- Nombre --}}
                         <div class="mb-3">
                             <label class="form-label d-flex align-items-center gap-2">
-                                <i data-feather="bookmark"></i> Nombre de la Unidad
+                                <i data-feather="bookmark"></i> Nombre de la Unidad <span class="text-danger">*</span>
                             </label>
                             <input type="text" name="nombre" id="nombre" class="form-control"
                                 value="{{ $unidad->nombre ?? '' }}"
@@ -62,7 +62,7 @@
                         {{-- Jefe --}}
                         <div class="mb-3">
                             <label class="form-label d-flex align-items-center gap-2">
-                                <i data-feather="user"></i> Jefe / Responsable
+                                <i data-feather="user"></i> Jefe / Responsable  (opcional)
                             </label>
                             <input type="text" name="jefe" id="jefe" class="form-control" value="{{ $unidad->jefe ?? '' }}"
                                 oninput="this.value=this.value.toUpperCase();onlyLetters(this);">
@@ -74,7 +74,7 @@
 
                             <div class="col-md-4">
                                 <label class="form-label d-flex align-items-center gap-2">
-                                    <i data-feather="key"></i> Código
+                                    <i data-feather="key"></i> Código 
                                 </label>
                                 <input type="text" name="codigo" id="codigo" class="form-control" readonly
                                     value="{{ $unidad->codigo ?? '' }}">
@@ -83,7 +83,7 @@
 
                             <div class="col-md-4">
                                 <label class="form-label d-flex align-items-center gap-2">
-                                    <i data-feather="phone"></i> Teléfono
+                                    <i data-feather="phone"></i> Teléfono <span class="text-danger">*</span>
                                 </label>
                                 <input type="text" name="telefono" id="telefono" class="form-control"
                                     value="{{ $unidad->telefono ?? '' }}" oninput="onlyNumbers(this);">
@@ -92,7 +92,7 @@
 
                             <div class="col-md-4">
                                 <label class="form-label d-flex align-items-center gap-2">
-                                    <i data-feather="hash"></i> Interno
+                                    <i data-feather="hash"></i> Interno<span class="text-danger">*</span>
                                 </label>
                                 <input type="text" name="interno" id="interno" class="form-control"
                                     value="{{ $unidad->interno ?? '' }}" oninput="onlyNumbers(this);">
@@ -100,15 +100,7 @@
                             </div>
                         </div>
 
-                        {{-- Nivel --}}
-                        <div class="mb-3">
-                            <label class="form-label d-flex align-items-center gap-2">
-                                <i data-feather="align-left"></i> Nivel Jerárquico
-                            </label>
-                            <input type="text" name="nivel" id="nivel" class="form-control"
-                                value="{{ $unidad->nivel ?? 1 }}" oninput="onlyNumbers(this);">
-                            <div class="invalid-feedback"></div>
-                        </div>
+                        
 
                         {{-- Estado --}}
                         @if(isset($unidad))

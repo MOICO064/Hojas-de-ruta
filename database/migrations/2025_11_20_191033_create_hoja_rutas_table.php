@@ -12,8 +12,8 @@ return new class extends Migration {
     {
         Schema::create('hoja_ruta', function (Blueprint $table) {
             $table->id();
-            $table->string('idgral', 50);
-            $table->string('numero_unidad', 10);
+            $table->integer('idgral')->default(0);
+            $table->integer('numero_unidad');
 
             $table->boolean('externo')->default(false);
             $table->string('nombre_solicitante')->nullable();
@@ -23,13 +23,12 @@ return new class extends Migration {
 
             $table->date('fecha_creacion');
             $table->string('cite')->nullable();
-            $table->string('prioridad', 20)->default('normal');
+            $table->boolean('urgente')->default(false);
             $table->string('asunto');
-            $table->enum('estado', ['pendiente', 'en_proceso', 'concluido', 'anulado']);
-            $table->string('gestion', 10);
-            $table->integer('fojas')->nullable();
-            $table->foreignId('creado_por')->constrained('funcionarios');
-            $table->dateTime('fecha_impresion');
+            $table->enum('estado', ['Pendiente', 'En Proceso', 'Concluido', 'Anulado']);
+            $table->integer('gestion');
+            $table->foreignId('creado_por')->constrained('users');
+            $table->dateTime('fecha_impresion')->nullable();
             $table->timestamps();
         });
     }

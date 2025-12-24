@@ -1,19 +1,21 @@
 $(document).ready(function () {
-    let gestion = $('#hojaruta-table').data('gestion') || '';
 
-    let table = $('#hojaruta-table').DataTable({
+    // ID de la hoja de ruta (contexto obligatorio)
+    let hojaId = $('#derivaciones-table').data('hoja-id');
+
+    let table = $('#derivaciones-table').DataTable({
         processing: true,
         serverSide: true,
         responsive: true,
-        ajax: `/admin/hojaruta/data/${gestion}`,
+        ajax: `/admin/hojaruta/${hojaId}/derivaciones/data`,
         columns: [
-            { data: 'idgral', name: 'idgral' },
-            { data: 'numero_unidad', name: 'numero_unidad' },
-            { data: 'asunto', name: 'asunto' },
+            { data: 'id', name: 'id' },
             { data: 'unidad_origen', name: 'unidad_origen' },
+            { data: 'unidad_destino', name: 'unidad_destino' },
+            { data: 'funcionario', name: 'funcionario' },
             { data: 'estado', name: 'estado' },
-            { data: 'urgente', name: 'urgente' },
-            { data: 'gestion', name: 'gestion' },
+            { data: 'fecha_derivacion', name: 'fecha_derivacion' },
+            { data: 'fecha_recepcion', name: 'fecha_recepcion' },
             { data: 'acciones', name: 'acciones', orderable: false, searchable: false }
         ],
         language: {
@@ -32,20 +34,17 @@ $(document).ready(function () {
         `
     });
 
-    // Botón de refrescar tabla
+    // 🔄 Botón refrescar tabla
     $('#refresh-table').on('click', function () {
-        $('#refresh-icon, #refresh-icon-mobile').addClass('spin');
 
         table.ajax.reload(null, false);
 
         table.on('xhr', function () {
-            $('#refresh-icon, #refresh-icon-mobile').removeClass('spin');
-
             Swal.fire({
                 toast: true,
                 position: 'top',
                 icon: 'success',
-                title: 'Tabla actualizada',
+                title: 'Derivaciones actualizadas',
                 showConfirmButton: false,
                 timer: 2000,
                 customClass: {
@@ -56,10 +55,10 @@ $(document).ready(function () {
         });
     });
 
-    // Feather icons después de cada draw
     table.on('draw.dt responsive-display.dt', function () {
         if (typeof feather !== 'undefined') {
             feather.replace();
         }
     });
+
 });

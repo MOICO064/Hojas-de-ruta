@@ -46,6 +46,7 @@ $(document).ready(function () {
             { data: 'telefono', name: 'telefono' },
             { data: 'interno', name: 'interno' },
             { data: 'nivel', name: 'nivel' },
+            { data: 'numero_unidad_actual', name: 'numero_unidad_actual' },
             { data: 'sub_unidades_count', name: 'sub_unidades_count' },
             { data: 'estado', name: 'estado' },
             { data: 'acciones', name: 'acciones', orderable: false, searchable: false }

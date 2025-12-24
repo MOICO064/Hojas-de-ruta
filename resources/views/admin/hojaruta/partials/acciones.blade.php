@@ -5,24 +5,29 @@
         <i data-feather="eye" class="icon-xxs"></i>
     </a>
 
+    <!-- Imprimir Hoja de Ruta -->
 
-    <a href="{{ route('admin.hojaruta.edit', $row->id) }}" class="btn btn-sm btn-warning" title="Editar Hoja de Ruta">
-        <i data-feather="edit" class="icon-xxs"></i>
+    <a href="" target="_blank" class="btn btn-sm btn-secondary" title="Imprimir Hoja de Ruta">
+        <i data-feather="printer" class="icon-xxs"></i>
     </a>
-    <!-- Editar Hoja de Ruta -->
-    @can('admin.hojaruta.edit')
-    @endcan
 
 
-    <form method="POST" action="{{ route('admin.hojaruta.destroy', $row->id) }}" class="d-inline-block delete-form">
-        @csrf
-        @method('DELETE')
-        <button type="submit" class="btn btn-sm btn-danger btn-delete" title="Eliminar Hoja de Ruta">
+
+    @if ($row->estado != 'Concluido' && $row->estado != 'Anulado' && $row->creado_por === auth()->user()->id)
+        <!-- Ver Derivaciones -->
+        <a href="{{ route('admin.derivaciones.index', $row->id) }}" class="btn btn-sm btn-primary" title="Ver Derivaciones">
+            <i data-feather="shuffle" class="icon-xxs"></i>
+        </a>
+        <!-- Editar Hoja de Ruta -->
+        <a href="{{ route('admin.hojaruta.edit', $row->id) }}" class="btn btn-sm btn-warning" title="Editar Hoja de Ruta">
+            <i data-feather="edit" class="icon-xxs"></i>
+        </a>
+
+        <!-- Eliminar Hoja de Ruta -->
+        <button type="button" class="btn btn-sm btn-danger" title="Eliminar Hoja de Ruta"
+            onclick="eliminarHojaRuta({{ $row->id }})">
             <i data-feather="trash-2" class="icon-xxs"></i>
         </button>
-    </form>
-    <!-- Eliminar Hoja de Ruta -->
-    @can('admin.hojaruta.destroy')
-    @endcan
+    @endif
 
 </div>

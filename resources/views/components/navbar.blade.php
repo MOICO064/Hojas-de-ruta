@@ -67,7 +67,7 @@
                 </div>
             </li>
 
-            <li class="dropdown stopevent ms-2">
+            <li class="dropdown stopevent ms-2 d-none">
                 <a class="btn btn-ghost btn-icon rounded-circle" href="#!" role="button" id="dropdownNotification"
                     data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="icon-xs" data-feather="bell"></i>
@@ -125,15 +125,90 @@
                     </div>
                 </div>
             </li>
+            <li class="dropdown stopevent ms-2">
+                <!-- Botón de notificaciones -->
+                <a class="btn btn-ghost btn-icon rounded-circle position-relative" href="#!" role="button"
+                    id="dropdownNotification" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="icon-xs" data-feather="bell"></i>
+                    <!-- Número de notificaciones -->
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        3
+                    </span>
+                </a>
+
+                <!-- Dropdown -->
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end" aria-labelledby="dropdownNotification">
+                    <div>
+                        <!-- Header -->
+                        <div class="border-bottom px-3 pt-2 pb-3 d-flex justify-content-between align-items-center">
+                            <p class="mb-0 text-dark fw-medium fs-4">Notifications</p>
+                            <a href="#!" class="text-muted d-none">
+                                <span>
+                                    <i class="me-1 icon-xs" data-feather="settings"></i>
+                                </span>
+                            </a>
+                        </div>
+
+                        <!-- Scrollable list -->
+                        <div data-simplebar style="height: 250px">
+                            <ul class="list-group list-group-flush notification-list-scroll">
+
+                                <!-- Notificación normal -->
+                                <li class="list-group-item bg-light">
+                                    <a href="#!" class="text-dark">
+                                        <h5 class="mb-1">Hoja de Ruta #1234 derivada</h5>
+                                        <p class="mb-0">Se te derivó esta hoja de ruta desde <strong>Dirección
+                                                Técnica</strong> el <strong>17/12/2025</strong>.</p>
+                                    </a>
+                                </li>
+
+                                <!-- Otra normal -->
+                                <li class="list-group-item bg-light">
+                                    <a href="#!" class="text-dark">
+                                        <h5 class="mb-1">Hoja de Ruta #1233 derivada</h5>
+                                        <p class="mb-0">Se te derivó esta hoja de ruta desde <strong>Secretaría
+                                                General</strong> el <strong>15/12/2025</strong>.</p>
+                                    </a>
+                                </li>
+
+                                <!-- Notificación de alerta -->
+                                <li class="list-group-item" style="background-color: #F8D7DA;">
+                                    <a href="#!" class="text-dark">
+                                        <h5 class="mb-1">Alerta: Hoja de Ruta #1220</h5>
+                                        <p class="mb-0">Esta hoja de ruta se encuentra <strong>5 días</strong> en tu
+                                            oficina. Revisa y procesa cuanto antes.</p>
+                                    </a>
+                                </li>
+
+                                <!-- Otra normal -->
+                                <li class="list-group-item bg-light">
+                                    <a href="#!" class="text-dark">
+                                        <h5 class="mb-1">Hoja de Ruta #1232 derivada</h5>
+                                        <p class="mb-0">Se te derivó esta hoja de ruta desde <strong>Área
+                                                Administrativa</strong> el <strong>16/12/2025</strong>.</p>
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="border-top px-3 py-2 text-center">
+                            <a href="#!" class="text-inherit">Ver todas las notificaciones</a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
             <!-- List -->
             <li class="dropdown ms-2">
                 <a class="rounded-circle" href="#!" role="button" id="dropdownUser" data-bs-toggle="dropdown"
-                    aria-haspopup="true" aria-expanded="false">
-                    <div class="avatar avatar-md avatar-indicators avatar-online">
-                        <img alt="avatar" src="{{ asset('assets/images/avatars/default.png') }}"
-                            class="rounded-circle" />
-                    </div>
-                </a>
+   aria-haspopup="true" aria-expanded="false">
+   <div class="avatar avatar-md avatar-indicators avatar-online d-flex justify-content-center align-items-center">
+       <i data-feather="user" class="icon-xs"></i>
+   </div>
+</a>
+
                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownUser">
                     <div class="px-4 pb-0 pt-2">
                         <div class="lh-1">

@@ -72,7 +72,6 @@ class UnidadController extends Controller
     public function store(Request $request)
     {
         try {
-            // Validación según el schema de la tabla unidades
             $validator = Validator::make($request->all(), [
                 'unidad_padre_id' => 'nullable|exists:unidades,id',
                 'jefe' => 'nullable|string|max:255',
@@ -80,7 +79,6 @@ class UnidadController extends Controller
                 'codigo' => 'nullable|string|max:20',
                 'telefono' => 'required|integer',
                 'interno' => 'required|integer',
-                'nivel' => 'required|integer|min:1'
             ]);
 
             if ($validator->fails()) {
@@ -88,27 +86,16 @@ class UnidadController extends Controller
                     'errors' => $validator->errors()
                 ], 422);
             }
-
-            // Determinar el nivel según la unidad padre
-            $nivelRequerido = 1; // por defecto si no tiene padre
+            
+            $nivel = 1;
             if ($request->unidad_padre_id) {
                 $unidadPadre = Unidad::find($request->unidad_padre_id);
                 if ($unidadPadre) {
-                    $nivelRequerido = $unidadPadre->nivel + 1;
-
-                    // Validar que el nivel enviado (si existe) sea mayor al de la unidad padre
-                    if ($request->nivel && $request->nivel != $nivelRequerido) {
-                        return response()->json([
-                            'errors' => [
-                                'nivel' => [
-                                    "El nivel debe ser {$nivelRequerido} porque la unidad padre tiene nivel {$unidadPadre->nivel}."
-                                ]
-                            ]
-                        ], 422);
-                    }
+                    $nivel = $unidadPadre->nivel + 1;
                 }
             }
 
+            // Crear la unidad
             $unidad = Unidad::create([
                 'unidad_padre_id' => $request->unidad_padre_id,
                 'jefe' => $request->jefe,
@@ -116,26 +103,29 @@ class UnidadController extends Controller
                 'codigo' => $request->codigo,
                 'telefono' => $request->telefono,
                 'interno' => $request->interno,
-                'nivel' => $request->nivel,
+                'nivel' => $nivel,
+                'numero_unidad_actual' => 0, 
             ]);
 
             return response()->json([
                 'message' => 'Unidad creada correctamente',
                 'unidad' => $unidad
             ]);
+
         } catch (Exception $e) {
             return response()->json([
                 'message' => "Error inesperado: " . $e->getMessage()
             ], 500);
         }
     }
+
+
     public function edit($id)
     {
         try {
-            // Buscar la unidad, si no existe lanza ModelNotFoundException
+           
             $unidad = Unidad::findOrFail($id);
 
-            // Todas las unidades activas menos la que estamos editando
             $unidades = Unidad::where('estado', 'ACTIVO')
                 ->where('id', '!=', $unidad->id)
                 ->get();

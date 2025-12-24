@@ -6,7 +6,10 @@ use App\Http\Controllers\FuncionarioController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\RolesAndPermisosController;
 use App\Http\Controllers\HojaRutaController;
-
+use App\Http\Controllers\BuzonEntradaController;
+use App\Http\Controllers\DerivacionController;
+use App\Http\Controllers\BuzonSalidaController;
+use Google\Client;
 
 Route::get('/', function () {
     return redirect('login');
@@ -160,43 +163,93 @@ Route::prefix('admin/roles-permisos')->middleware(['auth', 'verified', 'active']
 
     Route::get('/permisos/data', [RolesAndPermisosController::class, 'permisosData'])
         ->name('admin.permisos.data');
-
 });
 
 
 Route::prefix('admin/hojaruta')->middleware(['auth', 'verified', 'active'])->group(function () {
 
-    // Lista general o por gestión
     Route::get('/{gestion?}/gestion', [HojaRutaController::class, 'index'])
         ->name('admin.hojaruta.index');
-
-    // Crear nueva hoja de ruta
     Route::get('/crear', [HojaRutaController::class, 'create'])
         ->name('admin.hojaruta.create');
-
     Route::post('/', [HojaRutaController::class, 'store'])
         ->name('admin.hojaruta.store');
-
-    // Editar hoja de ruta
     Route::get('/{hoja}/editar', [HojaRutaController::class, 'edit'])
         ->name('admin.hojaruta.edit');
-
     Route::put('/{hoja}', [HojaRutaController::class, 'update'])
         ->name('admin.hojaruta.update');
-
-    // Eliminar hoja de ruta
     Route::delete('/{hoja}', [HojaRutaController::class, 'destroy'])
         ->name('admin.hojaruta.destroy');
-
-    // DataTable AJAX, opcionalmente filtrado por gestión
     Route::get('/data/{gestion?}', [HojaRutaController::class, 'data'])
         ->name('admin.hojaruta.data');
-
-    // Mostrar hoja de ruta individual
     Route::get('/{hoja}', [HojaRutaController::class, 'show'])
         ->name('admin.hojaruta.show');
-
+    Route::get('{unidad}/funcionarios', function ($unidad) {
+        return \App\Models\Funcionario::where('unidad_id', $unidad)
+            ->select('id', 'nombre')
+            ->get();
+    });
 });
+Route::prefix('admin/hojaruta/{hoja}/derivaciones')
+    ->middleware(['auth', 'verified', 'active'])
+    ->group(function () {
 
+
+        Route::get('/', [DerivacionController::class, 'index'])
+            ->name('admin.derivaciones.index');
+
+        Route::get('/crear', [DerivacionController::class, 'create'])
+            ->name('admin.derivaciones.create');
+
+        Route::post('/', [DerivacionController::class, 'store'])
+            ->name('admin.derivaciones.store');
+
+        Route::get('/{derivacion}/editar', [DerivacionController::class, 'edit'])
+            ->name('admin.derivaciones.edit');
+
+        Route::put('/{derivacion}', [DerivacionController::class, 'update'])
+            ->name('admin.derivaciones.update');
+
+        Route::delete('/{derivacion}', [DerivacionController::class, 'destroy'])
+            ->name('admin.derivaciones.destroy');
+
+        Route::get('/data', [DerivacionController::class, 'data'])
+            ->name('admin.derivaciones.data');
+
+        Route::get('/{derivacion}', [DerivacionController::class, 'show'])
+            ->name('admin.derivaciones.show');
+        Route::get('/{derivacion}/print', [DerivacionController::class, 'show'])
+            ->name('admin.derivaciones.print');
+    });
+
+
+Route::prefix('admin/buzon')
+    ->middleware(['auth', 'verified', 'active'])
+    ->group(function () {
+
+        Route::get('/entrada', [BuzonEntradaController::class, 'index'])
+            ->name('admin.buzon.entrada');
+
+        Route::get('/entrada/data', [BuzonEntradaController::class, 'data'])
+            ->name('admin.buzon.entrada.data');
+
+        Route::get('/salida', [BuzonSalidaController::class, 'index'])
+            ->name('admin.buzon.salida');
+
+        Route::get('/salida/data', [BuzonSalidaController::class, 'data'])
+            ->name('admin.buzon.salida.data');
+    });
+Route::get('/token-drive', function () {
+    $client = new Client();
+    $client->setAuthConfig(storage_path('app/google/credenciales.json'));
+    $client->setScopes(['https://www.googleapis.com/auth/drive.file']);
+
+    $token = $client->fetchAccessTokenWithAssertion();
+
+    return response()->json([
+        'access_token' => $token['access_token'],
+        'expires_in' => $token['expires_in']
+    ]);
+})->middleware('auth');
 
 require __DIR__ . '/auth.php';

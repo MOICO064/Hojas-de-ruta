@@ -3,9 +3,9 @@
 @section('content')
     <div class="d-flex justify-content-between align-items-center mb-5">
         <div>
-            <h3 class="mb-0">Hojas de Ruta</h3>
-            @if(isset($gestion))
-                <span class="badge bg-info text-dark fs-6 mb-0">Gestión: {{ $gestion }}</span>
+            <h3 class="mb-0">Buzon</h3>
+            @if(isset($buzon))
+                <span class="badge bg-info text-dark fs-6 mb-0"> {{ $buzon }}</span>
             @endif
         </div>
 
@@ -25,6 +25,7 @@
             </button>
         </div>
     </div>
+
     <div class="row">
         <div class="col-xl-12 col-12 mb-5">
             <div class="card">

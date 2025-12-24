@@ -12,7 +12,7 @@ class Derivacion extends Model
     protected $table = 'derivaciones';
 
     /**
-     * Atributos que se pueden asignar masivamente.
+     * Atributos asignables masivamente
      */
     protected $fillable = [
         'hoja_id',
@@ -20,13 +20,16 @@ class Derivacion extends Model
         'unidad_destino_id',
         'descripcion',
         'estado',
-        'derivado_por',
+        'funcionario_id',
+        'pdf',
+        'fileid',
+        'fojas',
         'fecha_derivacion',
         'fecha_recepcion',
     ];
 
     /**
-     * Casteo de atributos a tipos nativos.
+     * Casteo de atributos
      */
     protected $casts = [
         'fecha_derivacion' => 'datetime',
@@ -36,34 +39,34 @@ class Derivacion extends Model
     ];
 
     /**
-     * Relación con hoja de ruta
+     * Relación con Hoja de Ruta
      */
     public function hojaRuta()
     {
-        return $this->belongsTo(HojaRuta::class, 'hoja_id', 'id');
+        return $this->belongsTo(HojaRuta::class, 'hoja_id');
     }
 
     /**
-     * Unidad de origen de la derivación
+     * Unidad de origen
      */
     public function unidadOrigen()
     {
-        return $this->belongsTo(Unidad::class, 'unidad_origen_id', 'id');
+        return $this->belongsTo(Unidad::class, 'unidad_origen_id');
     }
 
     /**
-     * Unidad destino de la derivación
+     * Unidad destino
      */
     public function unidadDestino()
     {
-        return $this->belongsTo(Unidad::class, 'unidad_destino_id', 'id');
+        return $this->belongsTo(Unidad::class, 'unidad_destino_id');
     }
 
     /**
-     * Funcionario que derivó
+     * Funcionario asociado a la derivación (opcional)
      */
-    public function derivadoPor()
+    public function funcionario()
     {
-        return $this->belongsTo(Funcionario::class, 'derivado_por', 'id');
+        return $this->belongsTo(Funcionario::class, 'funcionario_id');
     }
 }

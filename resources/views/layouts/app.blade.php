@@ -11,13 +11,14 @@
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-M8S4MT3EYG"></script>
     <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() {
-            dataLayer.push(arguments);
-        }
-        gtag('js', new Date());
+    window.dataLayer = window.dataLayer || [];
 
-        gtag('config', 'G-M8S4MT3EYG');
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+
+    gtag('config', 'G-M8S4MT3EYG');
     </script>
 
     <!-- Favicon icon-->
@@ -48,7 +49,13 @@
     <link
         href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap5-theme@1.5.2/dist/select2-bootstrap-5-theme.min.css"
         rel="stylesheet" />
-
+    <!-- Filepond-->
+    <link href="https://unpkg.com/filepond/dist/filepond.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
+    <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.min.js">
+    </script>
+    <script src="https://unpkg.com/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.min.js">
+    </script>
 
     <title>GAMC - Hojas de Ruta</title>
 </head>
@@ -92,6 +99,8 @@
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
 
     <script src="{{ asset('js/swalAlert/theme.js') }}"></script>
+
+
     @yield('scripts')
 </body>
 

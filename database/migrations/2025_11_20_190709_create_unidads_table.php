@@ -26,6 +26,7 @@ return new class extends Migration {
 
             $table->integer('nivel')->default(1);
 
+            $table->integer('numero_unidad_actual')->default(0);
             $table->enum('estado', ['ACTIVO', 'ANULADO'])->default('ACTIVO');
 
             $table->timestamps();
