@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Derivacion extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
     protected $table = 'derivaciones';
 
@@ -21,6 +23,7 @@ class Derivacion extends Model
         'descripcion',
         'estado',
         'funcionario_id',
+        'derivado_por',
         'pdf',
         'fileid',
         'fojas',
@@ -39,34 +42,56 @@ class Derivacion extends Model
     ];
 
     /**
-     * Relación con Hoja de Ruta
+     * Relaciones
      */
+
+    // Hoja de Ruta asociada
     public function hojaRuta()
     {
         return $this->belongsTo(HojaRuta::class, 'hoja_id');
     }
 
-    /**
-     * Unidad de origen
-     */
+    // Unidad de origen
     public function unidadOrigen()
     {
         return $this->belongsTo(Unidad::class, 'unidad_origen_id');
     }
 
-    /**
-     * Unidad destino
-     */
+    // Unidad destino
     public function unidadDestino()
     {
         return $this->belongsTo(Unidad::class, 'unidad_destino_id');
     }
 
-    /**
-     * Funcionario asociado a la derivación (opcional)
-     */
+    // Funcionario asociado a la derivación (opcional)
     public function funcionario()
     {
         return $this->belongsTo(Funcionario::class, 'funcionario_id');
+    }
+
+    // Funcionario que derivó el documento
+    public function derivadoPor()
+    {
+        return $this->belongsTo(Funcionario::class, 'derivado_por');
+    }
+    /**
+     * Configuración del activity log
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('funcionario')
+            ->logOnly(['unidad_origen_id', 'unidad_destino_id', 'funcionario_id', 'descripcion', 'estado', 'fojas', 'pdf', 'fileid'])
+            ->logOnlyDirty()
+            ->setDescriptionForEvent(function (string $eventName) {
+                $authUser = auth()->user();
+                $authUserId = $authUser?->id;
+                $authUserEmail = $authUser?->email;
+
+                $relatedFuncionarioName = $this->funcionario?->nombre ?? $this->descripcion;
+
+                return "Derivación: {$relatedFuncionarioName} | Evento: {$eventName} | Realizado por: " .
+                    ($authUser ? "{$authUserEmail} ({$authUserId})" : "null");
+            });
     }
 }

@@ -62,7 +62,7 @@
                         {{-- Jefe --}}
                         <div class="mb-3">
                             <label class="form-label d-flex align-items-center gap-2">
-                                <i data-feather="user"></i> Jefe / Responsable  (opcional)
+                                <i data-feather="user"></i> Jefe / Responsable (opcional)
                             </label>
                             <input type="text" name="jefe" id="jefe" class="form-control" value="{{ $unidad->jefe ?? '' }}"
                                 oninput="this.value=this.value.toUpperCase();onlyLetters(this);">
@@ -74,7 +74,7 @@
 
                             <div class="col-md-4">
                                 <label class="form-label d-flex align-items-center gap-2">
-                                    <i data-feather="key"></i> Código 
+                                    <i data-feather="key"></i> Código
                                 </label>
                                 <input type="text" name="codigo" id="codigo" class="form-control" readonly
                                     value="{{ $unidad->codigo ?? '' }}">
@@ -100,7 +100,7 @@
                             </div>
                         </div>
 
-                        
+
 
                         {{-- Estado --}}
                         @if(isset($unidad))
@@ -142,6 +142,7 @@
     <script>
         $(document).ready(function () {
             $('#unidad_padre_id').select2({
+                theme: 'bootstrap-5',
                 placeholder: "-- Ninguna --",
                 allowClear: true,
                 width: '100%'

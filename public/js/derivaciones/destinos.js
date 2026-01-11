@@ -12,6 +12,7 @@ function renderUnidadesOptions() {
 
 function initSelects(container) {
     container.find(".unidad-destino, .funcionario").select2({
+              theme:"bootstrap-5",
         placeholder: "-- Seleccione --",
         width: "100%",
         allowClear: true,

@@ -1,8 +1,5 @@
 $(document).ready(function () {
 
-    /* ===============================
-       UTIL: LIMPIAR ERRORES
-    =============================== */
     function limpiarError(input) {
         input.removeClass('is-invalid');
 
@@ -13,16 +10,11 @@ $(document).ready(function () {
         }
     }
 
-    /* ===============================
-       LIMPIAR ERRORES AL ESCRIBIR
-    =============================== */
     $('#hojarutaForm').on('input change', 'input, select', function () {
         limpiarError($(this));
     });
 
-    /* ===============================
-       EXTERNO / INTERNO TOGGLE
-    =============================== */
+
     function toggleExterno() {
         if ($('#externo').is(':checked')) {
             $('#externoBox').removeClass('d-none');
@@ -36,11 +28,8 @@ $(document).ready(function () {
     }
 
     $('#externo').on('change', toggleExterno);
-    toggleExterno(); // al cargar (editar)
+    toggleExterno(); 
 
-    /* ===============================
-       CARGAR FUNCIONARIOS POR UNIDAD
-    =============================== */
     $('#unidad_origen_id').on('change', function () {
         const unidadId = $(this).val();
 
@@ -50,7 +39,7 @@ $(document).ready(function () {
         if (!unidadId) return;
 
         $.ajax({
-            url: `/admin/hojaruta/${unidadId}/funcionarios`,
+            url: `/admin/hojaruta/todos/funcionarios`,
             type: 'GET',
             success: function (data) {
                 data.forEach(f => {
@@ -75,9 +64,6 @@ $(document).ready(function () {
         });
     });
 
-    /* ===============================
-       SUBMIT FORM
-    =============================== */
     $('#hojarutaForm').on('submit', function (e) {
         e.preventDefault();
 

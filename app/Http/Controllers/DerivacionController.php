@@ -6,8 +6,11 @@ use Illuminate\Http\Request;
 use App\Models\HojaRuta;
 use App\Models\Derivacion;
 use App\Models\Unidad;
+use App\Models\Funcionario;
+use App\Models\NotificacionF;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 use Exception;
 
 class DerivacionController extends Controller
@@ -20,7 +23,7 @@ class DerivacionController extends Controller
         } catch (Exception $e) {
             \Log::error(
                 'Error al cargar la vista de Derivaciones | Hoja ID: ' . $hoja->id .
-                    ' | ' . $e->getMessage()
+                ' | ' . $e->getMessage()
             );
 
             return redirect()->back()
@@ -73,15 +76,15 @@ class DerivacionController extends Controller
             ->editColumn(
                 'fecha_derivacion',
                 fn($row) =>
-                optional($row->fecha_derivacion)->format('d/m/Y')
+                optional($row->fecha_derivacion)->format('d/m/Y H:i')
             )
 
             ->editColumn(
                 'fecha_recepcion',
                 fn($row) =>
                 $row->fecha_recepcion
-                    ? $row->fecha_recepcion->format('d/m/Y')
-                    : '<span class="text-muted">Pendiente</span>'
+                ? $row->fecha_recepcion->format('d/m/Y H:i')
+                : '<span class="text-muted">No recepcionado</span>'
             )
 
             ->editColumn('estado', function ($row) {
@@ -128,7 +131,13 @@ class DerivacionController extends Controller
     {
 
         try {
-            $unidades = Unidad::orderBy('nombre')->get();
+            $unidadFuncionarioId = auth()->user()->funcionario->unidad_id;
+
+            $unidades = Unidad::where('estado', 'ACTIVO')
+                ->where('id', '!=', $unidadFuncionarioId)
+                ->whereHas('funcionarios')
+                ->orderBy('nombre')
+                ->get();
 
             return view('admin.derivacion.form', compact('unidades', 'hoja'));
         } catch (Exception $e) {
@@ -140,28 +149,41 @@ class DerivacionController extends Controller
     {
         return $this->guardarDerivacion($request);
     }
-
-    /**
-     * Método común para crear derivación
-     */
-    private function guardarDerivacion(Request $request)
+    public function edit(HojaRuta $hoja, Derivacion $derivacion)
     {
+
+        $unidadFuncionarioId = auth()->user()->funcionario->unidad_id;
+
+        $unidades = Unidad::where('estado', 'ACTIVO')
+            ->where('id', '!=', $unidadFuncionarioId)
+            ->whereHas('funcionarios')
+            ->orderBy('nombre')
+            ->get();
+
+
+        return view('admin.derivacion.form-edit', [
+            'hoja' => $hoja,
+            'derivacion' => $derivacion,
+            'unidades' => $unidades,
+        ]);
+    }
+    public function update(Request $request, $hojaId, Derivacion $derivacion)
+    {
+        DB::beginTransaction();
+
         try {
             $user = auth()->user();
 
-            // Validación
             $validator = Validator::make($request->all(), [
-                'hoja_id' => 'required|exists:hoja_ruta,id',
-                'unidad_origen_id' => 'nullable|exists:unidades,id',
-                'unidad_destino_id' => 'required|exists:unidades,id',
+                'unidad_id' => 'required|exists:unidades,id',
+                'funcionario_id' => 'required|exists:funcionarios,id',
                 'descripcion' => 'required|string|max:1000',
-                'estado' => 'nullable|string|max:50',
-                'funcionario_id' => 'nullable|exists:funcionarios,id',
-                'pdf' => 'nullable|string', 
-                'fileid' => 'nullable|string',
-                'fojas' => 'nullable|string|max:255',
-                'fecha_derivacion' => 'nullable|date',
-                'fecha_recepcion' => 'nullable|date',
+                'pdf' => 'nullable|string',
+                'fojas' => 'nullable|integer|min:1',
+            ], [
+                'unidad_id.required' => 'La unidad destino es obligatoria',
+                'funcionario_id.required' => 'El funcionario es obligatorio',
+                'fojas.required_with' => 'Las fojas son obligatorias cuando se adjunta un PDF',
             ]);
 
             if ($validator->fails()) {
@@ -170,30 +192,175 @@ class DerivacionController extends Controller
                 ], 422);
             }
 
-            $derivacion = Derivacion::create([
-                'hoja_id' => $request->hoja_id,
-                'unidad_origen_id' => $request->unidad_origen_id ?? $user->funcionario->unidad_id ?? null,
-                'unidad_destino_id' => $request->unidad_destino_id,
-                'descripcion' => $request->descripcion,
-                'estado' => $request->estado ?? 'PENDIENTE',
-                'funcionario_id' => $request->funcionario_id,
-                'pdf' => $request->pdf,
-                'fileid' => $request->fileid,
-                'fojas' => $request->fojas,
-                'fecha_derivacion' => $request->fecha_derivacion ?? now(),
-                'fecha_recepcion' => $request->fecha_recepcion,
+            $derivacion->unidad_destino_id = $request->unidad_id;
+            $derivacion->funcionario_id = $request->funcionario_id;
+            $derivacion->descripcion = strtoupper($request->descripcion);
+            $derivacion->fojas = $request->fojas ?? $derivacion->fojas;
+
+            if ($request->pdf) {
+                $derivacion->pdf = "https://drive.google.com/file/d/{$request->pdf}/view";
+                $derivacion->fileid = $request->pdf;
+            }
+
+            $derivacion->save();
+
+            DB::commit();
+            return response()->json([
+                'message' => 'Derivación actualizada correctamente',
+                'data' => $derivacion,
+                'derivacion_id' => $derivacion->id,
             ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
 
             return response()->json([
-                'message' => 'Derivación creada correctamente',
-                'derivacion' => $derivacion
-            ]);
-
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => 'Error inesperado: ' . $e->getMessage()
+                'message' => 'Error inesperado',
+                'error' => $e->getMessage()
             ], 500);
         }
     }
 
+
+    private function guardarDerivacion(Request $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            $user = auth()->user();
+
+            $validator = Validator::make($request->all(), [
+                'hoja_id' => 'required|exists:hoja_ruta,id',
+                'descripcion' => 'required|string|max:1000',
+                'pdf' => 'nullable|string',
+                'fojas' => 'required_with:pdf|max:255',
+                'destinatarios' => 'required|array|min:1',
+                'destinatarios.*.unidad_destino_id' => 'required|exists:unidades,id',
+                'destinatarios.*.funcionario_id' => 'required|exists:funcionarios,id|distinct', // <-- aquí
+            ], [
+                'destinatarios.required' => 'Debe agregar al menos un destinatario',
+                'destinatarios.*.unidad_destino_id.required' => 'La unidad destino es obligatoria',
+                'destinatarios.*.funcionario_id.required' => 'El funcionario es obligatorio',
+                'destinatarios.*.funcionario_id.distinct' => 'No puede seleccionar el mismo funcionario más de una vez',
+                'fojas.required_with' => 'Las fojas son obligatorias cuando se adjunta un PDF',
+            ]);
+
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $derivacionAnterior = Derivacion::where('hoja_id', $request->hoja_id)
+                ->where('estado', '=', 'RECEPCIONADO')
+                ->latest('id')
+                ->first();
+
+            $derivaciones = [];
+            $pdfLink = $request->pdf
+                ? "https://drive.google.com/file/d/{$request->pdf}/view"
+                : null;
+
+            foreach ($request->destinatarios as $destino) {
+
+                $derivacion = Derivacion::create([
+                    'hoja_id' => $request->hoja_id,
+                    'unidad_origen_id' => $request->unidad_origen_id
+                        ?? $user->funcionario->unidad_id
+                        ?? null,
+                    'unidad_destino_id' => $destino['unidad_destino_id'],
+                    'funcionario_id' => $destino['funcionario_id'],
+                    'descripcion' => $request->descripcion,
+                    'estado' => 'PENDIENTE',
+                    'pdf' => $pdfLink,
+                    'fileid' => $request->pdf,
+                    'fojas' => $request->fojas,
+                    'fecha_derivacion' => now(),
+                    'fecha_recepcion' => null,
+                    'derivado_por' => $user->funcionario_id,
+                ]);
+
+                $derivaciones[] = Derivacion::with([
+                    'funcionario',
+                    'unidadDestino',
+                    'unidadOrigen'
+                ])->find($derivacion->id);
+
+                $notificacion = NotificacionF::create([
+                    'hoja_id' => $request->hoja_id,
+                    'funcionario_id' => $destino['funcionario_id'],
+                    'tipo' => 'DERIVACION',
+                    'mensaje' => "Tiene una nueva derivación pendiente de la hoja #{$request->hoja_id}",
+                    'fecha' => now(),
+                    'leido' => false,
+                ]);
+
+
+                event(new \App\Events\NuevaNotificacion($notificacion));
+            }
+
+            if ($derivacionAnterior) {
+                $derivacionAnterior->update([
+                    'estado' => 'CONCLUIDO'
+                ]);
+            }
+
+            HojaRuta::where('id', $request->hoja_id)
+                ->update([
+                    'estado' => 'En Proceso',
+                ]);
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Derivaciones creadas correctamente',
+                'total' => count($derivaciones),
+                'derivaciones' => $derivaciones
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'message' => 'Error inesperado',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function recepcionar($id)
+    {
+        try {
+            $derivacion = Derivacion::findOrFail($id);
+
+            if ($derivacion->estado === 'ANULADO') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se puede recepcionar una derivación anulada'
+                ], 422);
+            }
+
+            $derivacion->update([
+                'estado' => 'RECEPCIONADO',
+                'fecha_recepcion' => now()
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Derivación recepcionada correctamente'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error inesperado: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    public function funcionarios($unidadId)
+    {
+        $funcionarios = Funcionario::where('unidad_id', $unidadId)
+            ->select('id', 'nombre')
+            ->get();
+
+        return response()->json($funcionarios);
+    }
 }

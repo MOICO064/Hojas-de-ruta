@@ -7,7 +7,8 @@
         {{ isset($hoja) ? 'Editar Hoja de Ruta' : 'Crear Nueva Hoja de Ruta' }}
     </h3>
 
-    <a href="{{ route('admin.hojaruta.index') }}" class="btn btn-outline-primary d-flex align-items-center gap-2">
+    <a href="{{ isset($hoja) ? route('admin.hojaruta.show', $hoja->id) : route('admin.buzon.salida')  }}"
+        class="btn btn-outline-primary d-flex align-items-center gap-2">
         <i data-feather="arrow-left"></i>
         <span class="d-none d-md-inline">Volver</span>
     </a>
@@ -118,6 +119,7 @@
 <script>
 $(document).ready(function() {
     $('#unidad_origen_id, #solicitante_id').select2({
+              theme:"bootstrap-5",
         placeholder: "-- Seleccione --",
         allowClear: true,
         width: '100%'

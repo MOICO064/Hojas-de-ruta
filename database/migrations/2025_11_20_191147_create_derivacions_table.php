@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->foreignId('unidad_destino_id')->constrained('unidades');
             $table->foreignId('funcionario_id')->nullable()->constrained('funcionarios')->nullOnDelete();
             $table->text('descripcion')->nullable();
-            $table->enum('estado', ['DERIVADO', 'RECEPCIONADO', 'PENDIENTE', 'CONCLUIDO', 'ANULADO'])->default('PENDIENTE');
+            $table->enum('estado', ['RECEPCIONADO', 'PENDIENTE', 'CONCLUIDO', 'ANULADO'])->default('PENDIENTE');
             $table->foreignId('derivado_por')->constrained(table: 'funcionarios');
             $table->string('pdf')->nullable();
             $table->string('fileid')->nullable();

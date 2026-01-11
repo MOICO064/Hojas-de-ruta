@@ -77,7 +77,7 @@
                     <div class="card-body p-6">
                         <div class="mb-4">
                             <a href="{{ route('login') }}"><img
-                                    src="{{ asset('assets/images/recurces/gamc-320x128-23.png') }}" style="width:150px;"
+                                    src="{{ asset('assets/images/recurces/icono_sistema.png') }}" style="width:200px;"
                                     class="mb-2 text-inverse" alt="Image" /></a>
                             <p class="mb-6">Por favor ingrese sus datos de usuario.</p>
                         </div>
@@ -127,7 +127,7 @@
                             <!-- Link -->
                             <div class="d-md-flex justify-content-between mt-4">
                                 <div class="mb-2 mb-md-0">
-                                    <a href="" class="fs-5">Consultar Hoja de Ruta</a>
+                                    <a href="{{ route('consultar.hoja') }}" class="fs-5">Consultar Hoja de Ruta</a>
                                 </div>
                             </div>
                         </form>

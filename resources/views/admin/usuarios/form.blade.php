@@ -126,18 +126,16 @@
     <script src="{{ asset('js/usuarios/form.js') }}"></script>
 
     <script>
+        
         $(document).ready(function () {
             $('#funcionario_id').select2({
-                placeholder: "-- Seleccione un Funcionario --",
+                 theme:  'bootstrap-5',
+             placeholder: "-- Seleccione un Funcionario --",
                 allowClear: true,
                 width: '100%'
             });
 
-            $('#role').select2({
-                placeholder: "-- Seleccione un Rol --",
-                allowClear: true,
-                width: '100%'
-            });
+
 
             feather.replace();
         });

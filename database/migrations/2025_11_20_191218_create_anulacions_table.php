@@ -12,7 +12,8 @@ return new class extends Migration {
     {
         Schema::create('anulaciones', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('hoja_id')->constrained('hoja_ruta')->cascadeOnDelete();
+            $table->foreignId('hoja_id')->nullable()->constrained('hoja_ruta')->nullOnDelete();
+            $table->foreignId('derivacion_id')->nullable()->constrained('derivaciones')->nullOnDelete();
             $table->foreignId('funcionario_id')->constrained('funcionarios');
             $table->text('justificacion');
             $table->timestamp('fecha_anulacion')->useCurrent();

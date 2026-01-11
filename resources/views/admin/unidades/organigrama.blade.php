@@ -24,7 +24,7 @@
             padding: 10px 15px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, .15);
             text-align: center;
-            width: 180px;
+            width: 280px;
             /* ancho fijo */
             height: 100px;
             /* alto fijo */
@@ -53,7 +53,7 @@
         /* Responsivo: nodos siempre mismo tamaño */
         @media (max-width: 768px) {
             .node {
-                width: 180px;
+                width: 280px;
                 height: 100px;
             }
         }
@@ -92,7 +92,7 @@
             let structure = {
                 text: {
                     name: node.nombre,
-                    title: node.jefe ? "Jefe: " + node.jefe : "Sin jefe"
+                    title: node.jefe ? node.jefe : "Sin jefe"
                 },
                 HTMLclass: "node"
             };

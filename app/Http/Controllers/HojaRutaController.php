@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\HojaRuta;
 use App\Models\Unidad;
+use App\Models\Funcionario;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 use Exception;
+
 class HojaRutaController extends Controller
 {
     public function index($gestion = null)
@@ -85,12 +87,19 @@ class HojaRutaController extends Controller
     public function create()
     {
         try {
-            $unidades = Unidad::orderBy('nombre')->get();
+            $unidadFuncionarioId = auth()->user()->funcionario->unidad_id;
+
+            $unidades = Unidad::where('estado', 'ACTIVO')
+                ->where('id', '=', $unidadFuncionarioId)
+                ->whereHas('funcionarios')
+                ->orderBy('nombre')
+                ->get();
+
+
 
             return view('admin.hojaruta.form', compact('unidades'));
-
         } catch (Exception $e) {
-            return redirect()->route('admin.hojaruta.index')
+            return redirect()->route('dashboard')
                 ->with('error', 'Ocurrió un error al cargar el formulario: ' . $e->getMessage());
         }
     }
@@ -106,10 +115,15 @@ class HojaRutaController extends Controller
         try {
             $hoja = HojaRuta::findOrFail($id);
 
-            $unidades = Unidad::orderBy('nombre')->get();
+            $unidadFuncionarioId = auth()->user()->funcionario->unidad_id;
+
+            $unidades = Unidad::where('estado', 'ACTIVO')
+                ->where('id', '=', $unidadFuncionarioId)
+                ->whereHas('funcionarios')
+                ->orderBy('nombre')
+                ->get();
 
             return view('admin.hojaruta.form', compact('hoja', 'unidades'));
-
         } catch (Exception $e) {
             return redirect()->route('admin.hojaruta.index')
                 ->with('error', 'Ocurrió un error al cargar el formulario: ' . $e->getMessage());
@@ -216,13 +230,73 @@ class HojaRutaController extends Controller
                 'message' => $message,
                 'hoja' => $hoja
             ]);
-
         } catch (Exception $e) {
             return response()->json([
                 'message' => "Error inesperado: " . $e->getMessage()
             ], 500);
         }
     }
+    public function show($id)
+    {
+        $hojaRuta = HojaRuta::with([
+            'unidadOrigen',
+            'solicitante',
+            'creador',
+            'derivaciones.unidadOrigen',
+            'derivaciones.unidadDestino',
+            'derivaciones.funcionario',
+            'derivaciones.derivadoPor',
+            'anulaciones',
+        ])->findOrFail($id);
 
+        return view('admin.hojaruta.show', compact('hojaRuta'));
+    }
+    public function concluir($id)
+    {
+        try {
+            $hoja = HojaRuta::findOrFail($id);
 
+            if ($hoja->estado === 'ANULADO') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se puede concluir una hoja de ruta anulada'
+                ], 422);
+            }
+
+            if ($hoja->estado === 'CONCLUIDO') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'La hoja de ruta ya se encuentra concluida'
+                ], 422);
+            }
+
+            $hoja->update([
+                'estado' => 'CONCLUIDO',
+                'fecha_conclusion' => now(),
+            ]);
+
+            $hoja->derivaciones()
+                ->where('estado', '!=', 'ANULADO')
+                ->update(['estado' => 'CONCLUIDO']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Hoja de ruta concluida correctamente'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error inesperado: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    public function funcionarios()
+    {
+        $funcionarios = Funcionario::where('estado', 'ACTIVO')
+            ->select('id', 'nombre', )
+            ->orderBy('nombre', 'asc')
+            ->get();
+
+        return response()->json($funcionarios);
+    }
 }

@@ -1,4 +1,4 @@
-$(document).ready(function () {
+ $(document).ready(function () {
 
     // Limpiar errores de un input o select
     function limpiarError(input) {

@@ -1,4 +1,5 @@
 $(document).ready(function () {
+    let isSubmitting = false;
 
     /* =====================================================
        CARGAR FUNCIONARIOS SEGÚN UNIDAD DESTINO
@@ -15,7 +16,7 @@ $(document).ready(function () {
         if (!unidadId) return;
 
         $.ajax({
-            url: `/admin/hojaruta/${unidadId}/funcionarios`,
+            url: `/admin/derivaciones/${unidadId}/funcionarios`,
             type: "GET",
             success: function (data) {
                 data.forEach((f) => {
@@ -47,7 +48,7 @@ $(document).ready(function () {
 
         let feedback = input.next(".invalid-feedback");
         if (feedback.length) {
-            feedback.text("");
+            feedback.remove();
         }
     }
 
@@ -63,10 +64,27 @@ $(document).ready(function () {
     );
 
     /* =====================================================
+       UTIL: CONVERTIR ERROR LARAVEL A NAME HTML
+    ===================================================== */
+    function laravelFieldToInputName(field) {
+        // Campos normales: descripcion, fojas, etc.
+        if (!field.includes(".")) {
+            return field;
+        }
+
+        // Campos tipo array: destinatarios.0.unidad_destino_id
+        return field.replace(/\.(\d+)\./g, "[$1][").replace(/\./g, "]") + "]";
+    }
+
+    /* =====================================================
        SUBMIT FORM – CREAR DERIVACIÓN
     ===================================================== */
     $("#derivacionForm").on("submit", function (e) {
         e.preventDefault();
+
+        // ⛔ evitar doble submit
+        if (isSubmitting) return;
+        isSubmitting = true;
 
         const form = $(this);
         const formData = new FormData(this);
@@ -88,13 +106,17 @@ $(document).ready(function () {
         form.find(".is-invalid").removeClass("is-invalid");
         form.find(".invalid-feedback").remove();
 
-        // UI loading
+        /* =====================================================
+           UI LOADING – BLOQUEO TOTAL
+        ===================================================== */
         btn.prop("disabled", true);
-        spinner?.removeClass("d-none");
-        btnText?.addClass("opacity-50");
-
+        btn.css("pointer-events", "none");
+        spinner.removeClass("d-none");
+        btnText.addClass("opacity-50");
+        const hojaId = $("input[name='hoja_id']").val();
+        const url = `/admin/hojaruta/${hojaId}/derivaciones`;
         $.ajax({
-            url: "/admin/hojaruta/1/derivaciones",
+            url: url,
             type: "POST",
             data: formData,
             contentType: false,
@@ -107,10 +129,22 @@ $(document).ready(function () {
                SUCCESS
             ===================================================== */
             success: function (data) {
+                isSubmitting = false;
                 btn.prop("disabled", false);
-                spinner?.addClass("d-none");
-                btnText?.removeClass("opacity-50");
+                btn.css("pointer-events", "auto");
+                spinner.addClass("d-none");
+                btnText.removeClass("opacity-50");
 
+                // Abrir PDF en otra ventana
+                if (data.derivaciones && data.derivaciones.length > 0) {
+                    const derivacionesIds = data.derivaciones
+                        .map((d) => d.id)
+                        .join(",");
+                    const url = `/admin/reportes/derivaciones?derivaciones=${derivacionesIds}`;
+                    window.open(url, "_blank"); 
+                }
+
+                // Redirigir la página actual al buzón de salida
                 Swal.fire({
                     icon: "success",
                     title: "¡Éxito!",
@@ -120,7 +154,7 @@ $(document).ready(function () {
                     position: "center",
                     ...swalStyles(),
                 }).then(() => {
-                    window.location.href = `/admin/derivaciones/${data.derivacion.id}`;
+                    window.location.href = "/admin/buzon/salida"; 
                 });
             },
 
@@ -128,9 +162,11 @@ $(document).ready(function () {
                ERROR – MOSTRAR VALIDACIONES
             ===================================================== */
             error: function (xhr) {
+                isSubmitting = false;
                 btn.prop("disabled", false);
-                spinner?.addClass("d-none");
-                btnText?.removeClass("opacity-50");
+                btn.css("pointer-events", "auto");
+                spinner.addClass("d-none");
+                btnText.removeClass("opacity-50");
 
                 let message = "Error desconocido";
 
@@ -138,7 +174,8 @@ $(document).ready(function () {
                     const errors = xhr.responseJSON.errors;
 
                     $.each(errors, function (field, messages) {
-                        const input = form.find(`[name="${field}"]`);
+                        const inputName = laravelFieldToInputName(field);
+                        const input = form.find(`[name="${inputName}"]`);
 
                         if (!input.length) return;
 
@@ -146,7 +183,9 @@ $(document).ready(function () {
 
                         let feedback = input.next(".invalid-feedback");
                         if (!feedback.length) {
-                            feedback = $('<div class="invalid-feedback"></div>');
+                            feedback = $(
+                                '<div class="invalid-feedback"></div>'
+                            );
                             input.after(feedback);
                         }
 

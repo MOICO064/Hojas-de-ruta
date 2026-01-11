@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class HojaRuta extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
     protected $table = 'hoja_ruta';
 
@@ -79,7 +80,36 @@ class HojaRuta extends Model
      */
     public function anulaciones()
     {
-        return $this->hasMany(Anulacion::class, 'idhoja', 'id');
+        return $this->hasMany(Anulacion::class, 'hoja_id', 'id');
     }
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('hoja_ruta')
+            ->logOnly([
+                'idgral',
+                'numero_unidad',
+                'nombre_solicitante',
+                'unidad_origen_id',
+                'solicitante_id',
+                'cite',
+                'urgente',
+                'asunto',
+                'estado',
+                'gestion',
+                'fecha_creacion',
+                'fecha_impresion',
+            ])
+            ->logOnlyDirty()
+            ->setDescriptionForEvent(function (string $eventName) {
+                $authUser = auth()->user();
+                $authUserId = $authUser?->id;
+                $authUserEmail = $authUser?->email;
 
+                $solicitanteName = $this->solicitante?->nombre ?? $this->nombre_solicitante;
+
+                return "Hoja de Ruta: {$solicitanteName} | Evento: {$eventName} | Realizado por: " .
+                    ($authUser ? "{$authUserEmail} ({$authUserId})" : "null");
+            });
+    }
 }
